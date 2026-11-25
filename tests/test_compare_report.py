@@ -243,8 +243,10 @@ def _grid_lines(html_str: str) -> list[list[tuple[str | None, str]]]:
 
 
 def test_sample_sections_are_aligned_grids_under_column_names():
-    s = pl.DataFrame({"id": [1, 22, 333], "name": ["a", "a much longer name", "c"], "v": [1, 2, 3]})
-    t = pl.DataFrame({"id": [9999], "name": ["z"], "v": [4]})
+    s = pl.DataFrame(
+        {"id": [0, 1, 22, 333], "name": ["q", "a", "a much longer name", "c"], "v": [0, 1, 2, 3]}
+    )
+    t = pl.DataFrame({"id": [0, 9999], "name": ["q", "z"], "v": [0, 4]})
     html_str = pb.compare(s, t, keys="id").get_tabular_report().as_raw_html()
     lines = _grid_lines(html_str)
 
@@ -308,8 +310,8 @@ def test_sample_grids_show_as_many_columns_as_fit():
 
 
 def test_composite_keys_are_aligned_columns():
-    s = pl.DataFrame({"region": ["N", "South"], "id": [1, 200], "v": [1, 2]})
-    t = pl.DataFrame({"region": ["E"], "id": [3], "v": [3]})
+    s = pl.DataFrame({"region": ["W", "N", "South"], "id": [7, 1, 200], "v": [0, 1, 2]})
+    t = pl.DataFrame({"region": ["W", "E"], "id": [7, 3], "v": [0, 3]})
     lines = _grid_lines(pb.compare(s, t, keys=["region", "id"]).get_tabular_report().as_raw_html())
 
     key_lines = [
@@ -382,6 +384,138 @@ def test_step_report_follows_validation_language():
     assert "Rapport pour l'étape de validation 1" in text
     assert "Lignes modifiées" in text
     assert "Changed rows" not in text
+
+
+# ----------------------------------------------------------------------------------------------
+# Degrees of difference
+# ----------------------------------------------------------------------------------------------
+
+BASE = pl.DataFrame({"id": [1, 2, 3], "a": [1, 2, 3], "b": ["x", "y", "z"]})
+TWO_CHANGED = BASE.with_columns(a=pl.when(pl.col("id") < 3).then(pl.col("a") + 10).otherwise("a"))
+
+
+@pytest.mark.parametrize(
+    "source, target, kwargs, expected",
+    [
+        (BASE, BASE, {"keys": "id"}, None),
+        (BASE, TWO_CHANGED, {"keys": "id"}, "2 of the 6 compared values differ."),
+        (
+            BASE,
+            BASE.with_columns(a=pl.when(pl.col("id") == 1).then(9).otherwise("a")),
+            {"keys": "id"},
+            "1 of the 6 compared values differs.",
+        ),
+        (
+            BASE,
+            BASE.with_columns(a=pl.col("a") + 1, b=pl.col("b") + "!"),
+            {"keys": "id"},
+            "Every compared value differs.",
+        ),
+        # Missing and extra rows alone don't need a summary
+        (BASE, BASE.head(2), {"keys": "id"}, None),
+        (
+            BASE,
+            BASE.with_columns(id=pl.col("id") + 100),
+            {"keys": "id"},
+            "The tables have no keys in common.",
+        ),
+        (
+            BASE,
+            BASE.with_columns(a=pl.col("a") + 1),
+            {"keys": "*"},
+            "The tables have no rows in common.",
+        ),
+        (
+            BASE,
+            pl.DataFrame({"id": [1, 2], "sku": ["A", "B"]}),
+            {"keys": "id", "schema": "common"},
+            "The tables have no columns in common besides the keys.",
+        ),
+        (BASE, BASE.clear(), {"keys": "id"}, "The target table is empty."),
+        (BASE.clear(), BASE, {"keys": "id"}, "The source table is empty."),
+        (BASE.clear(), BASE.clear().drop("b"), {"keys": "id"}, "Both tables are empty."),
+        # (the verdict already says that no columns were compared)
+        (BASE, pl.DataFrame({"sku": ["A"]}), {}, None),
+    ],
+)
+def test_summary_says_how_different_the_tables_are(source, target, kwargs, expected):
+    from pointblank._compare_report import _Ctx, _summary_text
+
+    cmp = pb.compare(source, target, **kwargs)
+    assert _summary_text(cmp, _Ctx(unit=cmp.unit)) == expected
+    if expected is not None:
+        assert expected in _text(cmp.get_tabular_report())
+
+
+def test_summary_is_translated():
+    cmp = pb.compare(BASE, TWO_CHANGED, keys="id")
+    assert "2 des 6 valeurs comparées diffèrent." in _text(cmp.get_tabular_report(lang="fr"))
+    assert "2 der 6 verglichenen Werte weichen ab." in _text(cmp.get_tabular_report(lang="de"))
+
+
+def test_empty_tables():
+    # With no rows at all, there's no status bar or legend
+    cmp = pb.compare(BASE.clear(), BASE.clear().drop("b"), keys="id")
+    html_str = cmp.get_tabular_report().as_raw_html()
+    assert "display:flex" not in html_str
+    assert "match <strong>" not in html_str
+    assert COMPARISON_REPORT_TEXT["no_rows"]["en"] not in html_str
+
+    text = _text(pb.compare(BASE.clear(), BASE.clear(), keys="id").get_tabular_report())
+    assert "Result ✓ Both tables are empty." in text
+    assert "All 0 rows match" not in text
+
+
+def test_rows_of_a_table_compared_with_an_empty_one_are_not_sampled():
+    text = _text(pb.compare(BASE, BASE.clear(), keys="id").get_tabular_report())
+    assert "Missing from target (3 rows) The target table is empty." in text
+    assert "x" not in text.split("Missing from target")[1]
+
+    text = _text(pb.compare(BASE.clear(), BASE, keys="id").get_tabular_report())
+    assert "Extra in target (3 rows) The source table is empty." in text
+
+
+def test_keys_are_listed_inline_when_no_keys_are_in_common():
+    s = pl.DataFrame({"id": range(1, 13), "v": 0})
+    text = _text(
+        pb.compare(s, s.with_columns(id=pl.col("id") + 100), keys="id").get_tabular_report()
+    )
+    # One row per section, so that an offset (or a difference in format) is easy to see
+    assert "Missing from target (showing 10 of 12 rows) id 1 · 2 · 3 · 4 · 5" in text
+    assert "Extra in target (showing 10 of 12 rows) id 101 · 102 · 103" in text
+    assert " v " not in text
+
+    s = pl.DataFrame({"region": ["N", "S"], "id": [1, 2]})
+    t = pl.DataFrame({"region": ["n", "s"], "id": [1, 2]})
+    text = _text(pb.compare(s, t, keys=["region", "id"]).get_tabular_report())
+    assert "region, id (N, 1) · (S, 2)" in text
+    assert "region, id (n, 1) · (s, 2)" in text
+
+    s = pl.DataFrame({"id": [1, None]})
+    text = _text(pb.compare(s, pl.DataFrame({"id": [5]}), keys="id").get_tabular_report())
+    assert "id 1 · NULL (null key: can't be matched)" in text
+
+
+def test_columns_are_listed_together_when_no_columns_are_in_common():
+    s = pl.DataFrame({"id": [1], "name": ["a"], "v": [1.0]})
+    t = pl.DataFrame({"sku": ["A"], "price": [1.0]})
+    report = pb.compare(s, t, keys="*").get_tabular_report()
+    text = _text(report)
+    assert "Schema differences only in source id , name , v only in target sku , price" in text
+
+    # With a column in common, each column has its own row
+    text = _text(pb.compare(s, t.with_columns(id=pl.lit(1)), keys="*").get_tabular_report())
+    assert "name only in source" in text
+
+
+def test_multiset_without_common_columns_notes_that_there_are_no_values():
+    s = pl.DataFrame({"a": [1, 2, 3]})
+    t = pl.DataFrame({"b": [1]})
+    text = _text(pb.compare(s, t, keys="*").get_tabular_report())
+    assert (
+        "Missing from target (2 rows) (no columns in common, so there are no values to show)"
+        in text
+    )
 
 
 # ----------------------------------------------------------------------------------------------

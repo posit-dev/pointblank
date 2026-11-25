@@ -35,6 +35,7 @@ _GRID_CHARS = 108
 _GAP_CHARS = 2
 # (unquoted, since the styles are in single-quoted attributes)
 _MONO = "font-family:IBM Plex Mono, ui-monospace, monospace;"
+_SANS = "font-family:IBM Plex Sans, system-ui, sans-serif;"
 _SCHEMA_COLOR = "#7A7A7A"
 
 
@@ -148,10 +149,14 @@ def _comparison_report(
         (_dup_rows(cmp, limit, ctx), STATUS_COLORS["dup_key"]),
     ]
     if not any(section for section, _ in sections):
+        if cmp.n_source_rows == 0 and cmp.n_target_rows == 0:
+            detail = ctx.t("summary_both_empty")
+        else:
+            detail = ctx.t_count(ctx.u("all_rows_match"), cmp.n)
         result = {
             "group": ctx.t("group_result"),
             "item": _badge("✓", STATUS_COLORS["match"]),
-            "detail": ctx.t_count(ctx.u("all_rows_match"), cmp.n),
+            "detail": detail,
         }
         sections = [([result], STATUS_COLORS["match"])]
 
@@ -273,8 +278,12 @@ def _header_html(cmp: Comparison, lang: str = "en", locale: str | None = None) -
             verdict += f" <span style='color:#666;'>{ctx.t('strict_schema_note')}</span>"
 
     lines = [tables_line, verdict]
-    if not cmp.identical:
-        # (an identical comparison is all matches, which the verdict already says)
+    summary = _summary_text(cmp, ctx)
+    if summary is not None:
+        lines.append(f"<span style='color:#444;'>{esc(summary)}</span>")
+    if not cmp.identical and cmp.n > 0:
+        # (an identical comparison is all matches, which the verdict already says, and with no
+        # rows there's nothing to break down)
         lines += [_status_bar(cmp, ctx), _legend(cmp, ctx)]
     spec = _spec_badges(cmp, ctx)
     if spec:
@@ -285,6 +294,47 @@ def _header_html(cmp: Comparison, lang: str = "en", locale: str | None = None) -
         f"<div style='font-size:13px; line-height:1.9;{direction}'>"
         + "".join(f"<div>{line}</div>" for line in lines)
         + "</div>"
+    )
+
+
+def _summary_text(cmp: Comparison, ctx: _Ctx) -> str | None:
+    """
+    One plain-text sentence on how different the tables are, from a single changed value to
+    tables with nothing in common (`None` if the verdict and the counts say it all).
+    """
+    if cmp.identical:
+        return None
+    if cmp.n_source_rows == 0 and cmp.n_target_rows == 0:
+        return ctx.t("summary_both_empty")
+    if cmp.n_target_rows == 0:
+        return ctx.t("summary_target_empty")
+    if cmp.n_source_rows == 0:
+        return ctx.t("summary_source_empty")
+    if cmp._nothing_compared:
+        # (the verdict says so)
+        return None
+    if _nothing_in_common(cmp):
+        return ctx.t(
+            "summary_no_keys_in_common" if cmp.mode == "keyed" else "summary_no_rows_in_common"
+        )
+    if cmp.mode == "keyed" and not cmp.compared_columns:
+        return ctx.t("summary_only_keys_in_common")
+    if cmp.n_changed > 0:
+        n_values = sum(cmp.column_mismatches.values())
+        total = (cmp.n_match + cmp.n_changed) * len(cmp.compared_columns)
+        if n_values >= total:
+            return ctx.t("summary_every_value_differs")
+        return ctx.t_count("summary_values_differ", n_values, total=ctx.int(total))
+    return None
+
+
+def _nothing_in_common(cmp: Comparison) -> bool:
+    """Whether no row of either (non-empty) table aligns with a row of the other."""
+    return (
+        cmp.n_source_rows > 0
+        and cmp.n_target_rows > 0
+        and cmp.n_match + cmp.n_changed == 0
+        and cmp.n_dup_key == 0
     )
 
 
@@ -373,28 +423,24 @@ def _spec_badges(cmp: Comparison, ctx: _Ctx) -> str:
 def _schema_rows(cmp: Comparison, ctx: _Ctx) -> list[dict[str, str]]:
     diff = cmp.schema_diff
     group = ctx.t("group_schema")
-    out = []
     esc = html_lib.escape
-    case_pairs = dict(diff.case_only)
-    for col in diff.only_in_source:
-        hint = ""
-        if col in case_pairs:
-            hint = f" ({ctx.t('case_only_hint', column=f'<code>{esc(case_pairs[col])}</code>')})"
-        out.append(
+    if not cmp.compared_columns and not (diff.dtype_changed or diff.renamed or diff.case_only):
+        # With no columns in common, each table's columns are listed in one row
+        out = [
             {
                 "group": group,
-                "item": esc(col),
-                "detail": _chip(ctx.t("only_in_source"), STATUS_COLORS["missing"]) + hint,
+                # (in the text font, which the key column doesn't use)
+                "item": f"<span style='{_SANS}'>{_chip(ctx.t(label), color)}</span>",
+                "detail": ", ".join(f"<code>{esc(c)}</code>" for c in cols),
             }
-        )
-    for col in diff.only_in_target:
-        out.append(
-            {
-                "group": group,
-                "item": esc(col),
-                "detail": _chip(ctx.t("only_in_target"), STATUS_COLORS["extra"]),
-            }
-        )
+            for cols, label, color in [
+                (diff.only_in_source, "only_in_source", STATUS_COLORS["missing"]),
+                (diff.only_in_target, "only_in_target", STATUS_COLORS["extra"]),
+            ]
+            if cols
+        ]
+    else:
+        out = _unshared_column_rows(cmp, group, ctx)
     for col, s_dtype, t_dtype in diff.dtype_changed:
         out.append(
             {
@@ -423,6 +469,34 @@ def _schema_rows(cmp: Comparison, ctx: _Ctx) -> list[dict[str, str]]:
                 "group": group,
                 "item": ctx.t("column_order"),
                 "detail": ctx.t("column_order_detail"),
+            }
+        )
+    return out
+
+
+def _unshared_column_rows(cmp: Comparison, group: str, ctx: _Ctx) -> list[dict[str, str]]:
+    """One row per column that's in only one of the tables."""
+    diff = cmp.schema_diff
+    esc = html_lib.escape
+    case_pairs = dict(diff.case_only)
+    out = []
+    for col in diff.only_in_source:
+        hint = ""
+        if col in case_pairs:
+            hint = f" ({ctx.t('case_only_hint', column=f'<code>{esc(case_pairs[col])}</code>')})"
+        out.append(
+            {
+                "group": group,
+                "item": esc(col),
+                "detail": _chip(ctx.t("only_in_source"), STATUS_COLORS["missing"]) + hint,
+            }
+        )
+    for col in diff.only_in_target:
+        out.append(
+            {
+                "group": group,
+                "item": esc(col),
+                "detail": _chip(ctx.t("only_in_target"), STATUS_COLORS["extra"]),
             }
         )
     return out
@@ -533,11 +607,46 @@ def _missing_extra_rows(
     count = cmp.n_missing if status == "missing" else cmp.n_extra
     if count == 0:
         return []
-    frame = cmp._fetch(status, limit)
     title = ctx.t("group_missing" if status == "missing" else "group_extra")
+    other_rows = cmp.n_target_rows if status == "missing" else cmp.n_source_rows
+    if other_rows == 0 or cmp._nothing_compared:
+        # Every row of one table is missing from the other (which is empty), so a sample would
+        # only repeat the table; or there are no values to show
+        if other_rows == 0:
+            note = ctx.t("summary_target_empty" if status == "missing" else "summary_source_empty")
+        else:
+            note = ctx.t("no_values_note")
+        return [
+            {
+                "group": _sample_group(title, count, count, ctx),
+                "item": "",
+                "detail": f"<span style='color:#666;'>{note}</span>",
+            }
+        ]
+    frame = cmp._fetch(status, limit)
     group = _sample_group(title, len(frame), count, ctx)
     key_cols = cmp._key_out_names()
     records = list(frame.rows(named=True))
+    if cmp.mode == "keyed" and _nothing_in_common(cmp):
+        # With no keys in common, the keys alone show how the tables differ (e.g. an offset, or
+        # keys formatted differently), so they're listed inline
+        sep = " <span style='color:#999;'>&middot;</span> "
+        keys = sep.join(
+            "<span style='white-space:nowrap;'><bdi dir='ltr'>"
+            + _key_text(row, key_cols)
+            + "</bdi></span>"
+            for row in records
+        )
+        if any(_is_null(row[k]) for row in records for k in key_cols):
+            keys += f" <span style='color:#999; font-size:11px;'>{ctx.t('null_key_note')}</span>"
+        names = html_lib.escape(", ".join(key_cols))
+        return [
+            {
+                "group": group,
+                "item": f"<span style='color:#8A8A8A;'>{names}</span>",
+                "detail": f"<div style='line-height:1.7; {_MONO}'>{keys}</div>",
+            }
+        ]
     if cmp.mode == "multiset":
         exclude = {"n_source", "n_target"}
         keys = None
@@ -735,6 +844,12 @@ def _sample_group(title: str, shown: int, total: int, ctx: _Ctx, noun: str | Non
     else:
         count = ctx.t(f"showing_{noun}", shown=ctx.int(shown), total=ctx.int(total))
     return f"{title} ({count})"
+
+
+def _key_text(row: dict[str, Any], key_cols: list[str]) -> str:
+    """A row's key as HTML: its value, or a tuple of values for a composite key."""
+    values = [_fmt_value(row[k]) for k in key_cols]
+    return values[0] if len(values) == 1 else f"({', '.join(values)})"
 
 
 def _badge(text: str, color: str) -> str:
