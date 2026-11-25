@@ -170,6 +170,7 @@ from pointblank.validate import (
     _process_parquet_input,
     _process_title_text,
     _ValidationInfo,
+    _apply_segments,
     _is_string_date,
     _is_string_datetime,
     _convert_string_to_date,
@@ -3647,6 +3648,13 @@ def test_validation_pre_with_pyarrow_table() -> None:
     assert step.eval_error is None
     assert (step.n, step.n_passed) == (4, 2)
     assert "syn_target_col" in step.notes
+
+
+def test_apply_segments_unsupported_table_type_raises(monkeypatch) -> None:
+    monkeypatch.setattr("pointblank.validate._get_tbl_type", lambda data: "unknown")
+
+    with pytest.raises(ValueError, match="Unsupported table type: unknown"):
+        _apply_segments(pl.DataFrame({"seg": ["a", "b"]}), ("seg", "a"))
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
