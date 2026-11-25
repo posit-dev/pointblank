@@ -29263,8 +29263,8 @@ def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
     Parameters
     ----------
     data_tbl
-        The data table to filter. It can be a Pandas DataFrame, Polars DataFrame, or an Ibis
-        backend table.
+        The data table to filter. It can be a Pandas, Polars, or PySpark DataFrame, a PyArrow
+        table, or an Ibis backend table.
     segments_expr
         The segments expression to apply. It is a tuple of the form `(column, value)`.
 
@@ -29420,6 +29420,10 @@ def _apply_segments(data_tbl: Any, segments_expr: tuple[str, str]) -> Any:
             data_tbl = data_tbl.filter(data_tbl[column].isin(segment))  # pragma: no cover
         else:
             data_tbl = data_tbl.filter(data_tbl[column] == segment)
+
+    else:
+        # Returning the table unfiltered would check the step against every row without any error
+        raise ValueError(f"Unsupported table type: {tbl_type}")
 
     return data_tbl
 
