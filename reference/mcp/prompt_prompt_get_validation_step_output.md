@@ -10,7 +10,7 @@ Example ID of the Validator.
 Provide a value matching the following JSON schema: {"type":"string"}. Encode non-string values as JSON.
 
 `step_index: string`  
-Example step index for the first mode of operation.
+Example step number (1-based) for the first mode of operation.
 
 Provide a value matching the following JSON schema: {"anyOf":\[{"type":"integer"},{"type":"null"}\]}. Encode non-string values as JSON.
 
@@ -33,8 +33,8 @@ Provide a value matching the following JSON schema: {"anyOf":\[{"type":"string"}
 > Please call the `get_validation_step_output` tool using only **one** of the following mutually exclusive options:
 >
 > **OPTION 1: Get data for a specific step**
-> To get the data extract for step number 0, use the `step_index` parameter. For example:
-> `get_validation_step_output(validator_id='validator_123', step_index=0, output_path='step_0_data.csv')`
+> To get the data extract for step number 1, use the `step_index` parameter. For example:
+> `get_validation_step_output(validator_id='validator_123', step_index=1, output_path='step_1_data.csv')`
 >
 > **OPTION 2: Get all passed or failed data**
 > To get all rows that 'fail' across all validation steps, use the `sundered_type` parameter. For example:

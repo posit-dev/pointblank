@@ -427,7 +427,7 @@ ul.task-list li input[type="checkbox"] {
 <dl>
 <dt><code><span class="doc-parameter-name">step_index</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">string</span></code></dt>
 <dd>
-<p>Example step index for the first mode of operation.</p>
+<p>Example step number (1-based) for the first mode of operation.</p>
 </dd>
 </dl>
 <p>Provide a value matching the following JSON schema: {“anyOf”:[{“type”:“integer”},{“type”:“null”}]}. Encode non-string values as JSON.</p>
@@ -468,8 +468,8 @@ ul.task-list li input[type="checkbox"] {
 <pre class="text"><code>Please call the `get_validation_step_output` tool using only **one** of the following mutually exclusive options:
 
 **OPTION 1: Get data for a specific step**
-To get the data extract for step number 0, use the `step_index` parameter. For example:
-`get_validation_step_output(validator_id='validator_123', step_index=0, output_path='step_0_data.csv')`
+To get the data extract for step number 1, use the `step_index` parameter. For example:
+`get_validation_step_output(validator_id='validator_123', step_index=1, output_path='step_1_data.csv')`
 
 **OPTION 2: Get all passed or failed data**
 To get all rows that 'fail' across all validation steps, use the `sundered_type` parameter. For example:

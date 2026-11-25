@@ -26,4 +26,4 @@ Path to save the output file. Must end with .csv. required
 Retrieve all 'pass' or 'fail' rows.
 
 `step_index: any`  
-Specific step index (0-based). Overrides sundered_type.
+Specific step number (1-based). Overrides sundered_type.
