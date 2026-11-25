@@ -625,7 +625,7 @@ async def get_validation_step_output(
 
     p_output_path = validate_output_path(output_path, {".csv"})
 
-    n_steps = len(cast(list[Any], validator.validation_info))
+    n_steps = len(validator.validation_info)
     if step_index is not None and not 1 <= step_index <= n_steps:
         raise ValueError(
             f"The 'step_index' must be a step number from 1 to {n_steps} (it's 1-based), "
