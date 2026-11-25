@@ -57,6 +57,7 @@ except ImportError:
 import pandas as pd
 import polars as pl
 import pyarrow as pa
+import pyarrow.compute as pc
 from polars.testing import assert_frame_equal
 import pytz
 import ibis
@@ -169,6 +170,7 @@ from pointblank.validate import (
     _process_parquet_input,
     _process_title_text,
     _ValidationInfo,
+    _apply_segments,
     _is_string_date,
     _is_string_datetime,
     _convert_string_to_date,
@@ -3600,6 +3602,59 @@ def test_validation_with_segments_and_pre_pandas() -> None:
 
     # Should have run validation for both segments
     assert len(validation.validation_info) == 2
+
+
+def _segment_counts(validation: Validate) -> list[tuple[int, int, bool | None]]:
+    return [(i.n, i.n_passed, i.eval_error) for i in validation.validation_info]
+
+
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "pyarrow"])
+def test_validation_segments_match_across_tables(tbl_type) -> None:
+    data = {"n": [1, 2, 3, 4, 5], "seg": ["a", "a", "b", "b", None]}
+    tbl = {
+        "polars": lambda: pl.DataFrame(data),
+        "pandas": lambda: pd.DataFrame(data),
+        "pyarrow": lambda: pa.table(data),
+    }[tbl_type]()
+
+    by_column = Validate(tbl).col_vals_gt(columns="n", value=2, segments="seg").interrogate()
+    assert _segment_counts(by_column) == [(2, 0, None), (2, 2, None), (1, 1, None)]
+
+    by_value = Validate(tbl).col_vals_gt(columns="n", value=2, segments=("seg", "b")).interrogate()
+    assert _segment_counts(by_value) == [(2, 2, None)]
+
+    by_group = (
+        Validate(tbl).col_vals_gt(columns="n", value=2, segments=("seg", ["a", "b"])).interrogate()
+    )
+    assert _segment_counts(by_group) == [(2, 0, None), (2, 2, None)]
+
+    by_missing = (
+        Validate(tbl).col_vals_gt(columns="n", value=2, segments=("seg", None)).interrogate()
+    )
+    assert _segment_counts(by_missing) == [(1, 1, None)]
+
+
+def test_validation_pre_with_pyarrow_table() -> None:
+    tbl = pa.table({"n": [1, 2, 3, 4], "m": [10, 20, 30, 40]})
+
+    def add_column(t):
+        return t.append_column("computed", pc.multiply(t["n"], t["m"]))
+
+    validation = (
+        Validate(tbl).col_vals_gt(columns="computed", value=50, pre=add_column).interrogate()
+    )
+
+    step = validation.validation_info[0]
+    assert step.eval_error is None
+    assert (step.n, step.n_passed) == (4, 2)
+    assert "syn_target_col" in step.notes
+
+
+def test_apply_segments_unsupported_table_type_raises(monkeypatch) -> None:
+    monkeypatch.setattr("pointblank.validate._get_tbl_type", lambda data: "unknown")
+
+    with pytest.raises(ValueError, match="Unsupported table type: unknown"):
+        _apply_segments(pl.DataFrame({"seg": ["a", "b"]}), ("seg", "a"))
 
 
 @pytest.mark.skipif(not PYSPARK_AVAILABLE, reason="PySpark not available")
