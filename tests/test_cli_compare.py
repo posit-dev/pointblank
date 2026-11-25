@@ -51,12 +51,25 @@ def test_differences_exit_one_with_summary(files):
         "DIFFERENT",
         "Row status",
         "Column mismatches",
+        "1 of the 6 compared values differs.",
         "Changed rows (1)",
         "Missing from target (1)",
         "Extra in target (1)",
         "20.5",
     ]:
         assert text in result.output, text
+
+
+def test_rows_compared_with_an_empty_table_are_not_sampled(tmp_path, files):
+    src, _ = files
+    empty = tmp_path / "empty.csv"
+    SOURCE.head(0).write_csv(empty)
+
+    result = _run(src, str(empty), "-k", "id")
+    assert result.exit_code == 1
+    assert "The target table is empty." in result.output
+    assert "Missing from target (4)\nThe target table is empty." in result.output
+    assert "30.0" not in result.output
 
 
 def test_no_exit_code(files):
