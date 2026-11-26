@@ -821,9 +821,10 @@ def _resolve_columns_subset(
         return col(columns_subset)
     if isinstance(columns_subset, str):
         return [columns_subset]
-    # (a collection of names is passed through as given, so it can be a tuple or another collection)
-    # pyrefly: ignore[bad-return]  # a collection of names is passed through as given
-    return columns_subset
+    if columns_subset is None or isinstance(columns_subset, Column):
+        return columns_subset
+    # Any other collection of names (e.g., a tuple) becomes a list, which is what interrogation uses
+    return [cast(str, name) for name in columns_subset]
 
 
 def _narwhals_expr_nodes(expr: nw.Expr) -> list[Any]:
