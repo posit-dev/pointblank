@@ -1344,6 +1344,195 @@ String template actions are plain text, so they work without `allow_python=True`
 from configurations you don't fully trust, use string template actions and handle the external
 communication in your application code after validation completes.
 
+## Composed Configurations
+
+A YAML configuration with a top-level `defaults:` list is composed with
+[Hydra](https://hydra.cc) into a plain configuration, which is then used like any other. This
+requires the `hydra` extra (`pip install "pointblank[hydra]"`). For task-oriented instructions,
+see [Composing Configurations with Hydra](hydra-composition.qmd).
+
+### Additional Top-level Keys
+
+```yaml
+defaults:                              # Selections from config groups
+  - override /pointblank/tbl: small_table
+  - override /pointblank/checks:
+      - ids
+  - _self_
+vars:                                  # Values for `${vars.<name>}` interpolations
+  id_column: a
+```
+
+- `defaults`: a list of config group selections. It is consumed by the composition.
+- `vars`: a mapping of any values, for use in interpolations. It is removed from the composed
+configuration.
+- `checks`: the selected check collections, each under its own name. This key is filled in by
+`pointblank/checks` options and is removed from the composed configuration, where the steps of
+the collections are part of `steps`.
+
+All other top-level keys are those of a plain configuration. The requirements of a plain
+configuration (such as the presence of `tbl` and `steps`) apply to the composed result.
+
+### The `defaults` List
+
+```yaml
+defaults:
+  - override /<group>: <option>        # Select one option of a group
+  - override /<group>:                 # Select several options of a group
+      - <option>
+      - <option>
+  - _self_                             # The position of this file's own values
+```
+
+- an `<option>` is the path of a YAML file within the directory of its group, without the
+`.yaml` suffix (e.g., `acme/ids` for `pointblank/checks/acme/ids.yaml`)
+- values from entries later in the list take precedence over earlier ones; with `_self_` last,
+the values in the file take precedence over those of the selected options
+
+### Config Groups
+
+| Group | `# @package` header | Options per config | Sets |
+|-------|---------------------|--------------------|------|
+| `pointblank/tbl` | `_global_` | one | `tbl`, `tbl_name`, `df_library` |
+| `pointblank/thresholds` | `thresholds` | one | `thresholds` |
+| `pointblank/actions` | `_global_` | one | `actions`, `final_actions` |
+| `pointblank/checks` | `checks.<name>` | any number | steps, placed before those of the config |
+| `pointblank/missing_specs` | `missing_specs.<name>` | any number | `missing_specs` |
+| `pointblank/ablation` | `ablation` | one | `ablation` |
+
+An option is a YAML file in a directory named after its group, with the header of the group as
+its first line. No group has an option selected by default.
+
+### Built-in Options
+
+`pointblank/tbl` has an option for each dataset that `load_dataset()` provides: `small_table`,
+`game_revenue`, `nycflights`, and `global_sales`.
+
+`pointblank/thresholds` has three options:
+
+| Option | `warning` | `error` | `critical` |
+|--------|-----------|---------|------------|
+| `strict` | 0.01 | 0.05 | 0.10 |
+| `standard` | 0.05 | 0.10 | 0.15 |
+| `lenient` | 0.10 | 0.25 | 0.35 |
+
+An option in a project's own directories can't have the path of a built-in option.
+
+### Check Collections
+
+```yaml
+# @package checks.<name>               # REQUIRED: a name no other selected collection has
+steps:                                 # REQUIRED: List of validation steps
+  - validation_method_name
+  - validation_method_name:
+      parameter: value
+```
+
+The steps of the selected collections are placed in the order the collections are selected,
+followed by the `steps` of the configuration that selects them.
+
+### Interpolation
+
+- `${vars.<name>}`: the value of `<name>` under the top-level `vars` key
+- `${<key>.<key>}`: the value at any other path in the configuration
+- `${oc.env:<VARIABLE>}`: the value of an environment variable
+- `\${`: a literal `${` (in an unquoted or single-quoted YAML string)
+
+### Python Objects (`_target_`)
+
+A mapping with a `_target_` key is replaced by a Python object when the configuration is run.
+
+```yaml
+tbl:                                   # The result of `polars.read_parquet("data/orders.parquet")`
+  _target_: polars.read_parquet
+  source: data/orders.parquet
+
+steps:
+  - specially:
+      expr:                            # The result of `acme_checks.checks.min_rows(n=100)`
+        _target_: acme_checks.checks.min_rows
+        n: 100
+  - row_count_match:
+      count: 5
+      pre:                             # `functools.partial(polars.DataFrame.head, n=5)`
+        _target_: polars.DataFrame.head
+        _partial_: true
+        n: 5
+```
+
+- `_target_`: the import path of a callable, which is called with the other keys as its
+arguments
+- `_partial_: true`: the callable is not called; the object is a `functools.partial` of it with
+the other keys as arguments
+- `_args_`: a list of positional arguments
+- a `_target_` can be used wherever a `python:` block can
+
+Targets are instantiated by `hydra_interrogate()`, `pb run`, `hydra_steps()`, and the composed
+forms of `Contract.from_yaml()` and `Pipeline.from_yaml()`. `hydra_compose()` and `pb compose`
+leave them as mappings.
+
+A target is imported and called without `allow_python=True`. A composed configuration can
+therefore run any code that's installed, and should be trusted to the same degree as a Python
+script. If the application has set an execution whitelist (available with `lerna`), only the
+targets it allows are instantiated.
+
+### Overrides
+
+Overrides are given to `overrides=` in Python and after the file name on the command line.
+They take precedence over the configuration file.
+
+| Override | Effect |
+|----------|--------|
+| `pointblank/thresholds=strict` | select an option of a group |
+| `pointblank/checks=[ids,acme/emails]` | select several options of a group, in this order |
+| `~pointblank/thresholds` | select no option of a group that takes one option |
+| `pointblank/checks=[]` | select no options of a group that takes any number |
+| `thresholds.warning=0.2` | set a value that is in the composed configuration |
+| `+vars.id_column=a` | add a value that is not in the composed configuration |
+| `~thresholds.warning` | remove a value |
+| `checks.ids.steps.0.col_vals_not_null.columns=b` | set a value in a step of a collection, by position |
+
+### Where Options Are Looked Up
+
+An option is taken from the first of these that has it:
+
+1. the options built into Pointblank
+2. the config trees of installed packages (see
+[Sharing Checks in a Package](sharing-checks-in-a-package.qmd))
+3. the directory of the configuration file
+4. the directory given as `config_dir=` or `--config-dir`
+
+### Differences from a Plain Configuration
+
+- an unquoted date (e.g., `value: 2024-01-01`) is read as a string, not as a date
+- `${` starts an interpolation
+- the files of config group options must have the `.yaml` suffix (the configuration file itself
+can have `.yaml` or `.yml`)
+- the configuration is given as a file path, not as a string of YAML
+- `_target_` is only supported in a composed configuration. The output of `pb compose` for a
+configuration that has one can't be run as a plain configuration
+
+### Functions and Commands
+
+- `hydra_compose()`: returns the composed configuration as a dictionary
+- `hydra_interrogate()`: composes a configuration and runs it
+- `hydra_steps()`: returns the steps of one check collection as a `Steps` object
+- `Contract.from_yaml()`: composes a contract file that has a `defaults:` list. The file has
+the contract's fields at its top level, and can select options of `pointblank/checks` and
+`pointblank/thresholds`
+- `Pipeline.from_yaml()`: composes a pipeline file that has a `defaults:` list. The `source`
+and `target` contracts can each have a `checks:` list of the names of selected collections,
+whose steps are placed before those of the contract. A selected `pointblank/thresholds` option
+sets the thresholds of the pipeline, unless the file has them under `pipeline:`
+- `pb run`: composes a configuration file that has a `defaults:` list, or one made up only of
+overrides, and runs it
+- `pb compose`: prints the composed configuration
+
+Composition uses the `hydra-core` package when it's installed, and otherwise `lerna`, which has
+the same API. Setting the `POINTBLANK_CONFIG_BACKEND` environment variable to `lerna` uses
+`lerna` in either case. Config trees of installed packages are only found when `lerna` is
+installed.
+
 ## Best Practices
 
 ### Organization

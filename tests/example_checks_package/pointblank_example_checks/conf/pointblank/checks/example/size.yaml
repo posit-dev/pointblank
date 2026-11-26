@@ -1,0 +1,6 @@
+# @package checks.example_size
+steps:
+  - specially:
+      expr:
+        _target_: pointblank_example_checks.checks.min_rows
+        n: ${vars.min_rows}

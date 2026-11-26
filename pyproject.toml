@@ -72,6 +72,11 @@ excel = ["openpyxl>=3.0.0"]
 cdisc = ["lxml>=4.9.0"]
 # For `pb.ablation.sklearn_evaluator()`: 1.4.2 is the first scikit-learn that works with NumPy 2
 ml = ["scikit-learn>=1.4.2"]
+# For `pb.hydra_compose()` and `pb.hydra_interrogate()`: either package can do the composing, and
+# `lerna` is what finds the config trees that other packages register through entry points
+hydra = ["hydra-core>=1.3", "lerna>=2.0.4"]
+# For `pointblank.integrations.ccflow`, which runs a composed validation as a ccflow model
+ccflow = ["ccflow>=0.9", "hydra-core>=1.3", "lerna>=2.0.4"]
 # For the CDISC CORE conformance engine wrapper (`validate_cdisc_submission`,
 # `SubmissionPackage.validate_conformance(engine="core")`): pyreadstat materializes in-memory
 # datasets to XPT for CORE. The CORE engine itself is an externally-installed executable / Docker
@@ -107,20 +112,26 @@ docs = [
     "opentelemetry-api>=1.23.0",                 # OTelExporter and emit_otel() examples
     "opentelemetry-sdk>=1.23.0",
     "scikit-learn>=1.4.2",                       # Data ablation worked example (1.4.2+ works with NumPy 2)
+    "hydra-core>=1.3",                           # Composed configuration examples
+    "lerna>=2.0.4",
+    "ccflow>=0.9",                               # ccflow integration example
 ]
 
 [dependency-groups]
 dev = [
     "anthropic[bedrock]>=0.68.0",                           # Lets the AI provider setup paths run in tests
+    "ccflow>=0.9",                                          # So the ccflow integration tests run
     "chatlas>=0.10.0",                                      # Older chatlas passes the wrong HTTP client to anthropic 0.68+
     "duckdb>=1.2.0,<2",                                     # 2.0 breaks ibis's `list_tables()` and Narwhals' joins
     "hypothesis>=6.129.2",
+    "hydra-core>=1.3",                                      # So the Hydra composition tests run on both backends
     "ibis-framework[duckdb,mysql,postgres,sqlite]>=11.0.0", # ibis 10.x fails on DuckDB 1.4+
     "narwhals>=2.8.0",                                      # Older Narwhals fails on DuckDB 1.5+
     "opentelemetry-api>=1.23.0",                            # So the otel tests run (1.22.0 has no `Meter.create_gauge()`)
     "opentelemetry-sdk>=1.23.0",
     "sqlglot>=23.4,<30.18",                                 # 30.18+ omits table names in DROP statements (breaks DuckDB/SQLite)
     "jupyter",
+    "lerna>=2.0.4",
     "nbclient>=0.10.0",
     "nbformat>=5.10.4",
     "pandas>=2.2.3",
@@ -155,6 +166,11 @@ homepage = "https://github.com/posit-dev/pointblank"
 
 [project.entry-points.pytest11]
 pointblank = "pointblank.pytest_plugin"
+
+# Puts the config groups in `pointblank/conf` on the Hydra search path of other applications
+# (`pb.hydra_compose()` finds them without this)
+[project.entry-points."hydra.lernaplugins"]
+pointblank = "pkg:pointblank.conf"
 
 [project.scripts]
 pb = "pointblank.cli:cli"

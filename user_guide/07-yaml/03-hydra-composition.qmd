@@ -1,0 +1,336 @@
+---
+title: Composing Configurations with Hydra
+jupyter: python3
+toc-expand: 2
+html-table-processing: none
+bread-crumbs: true
+---
+
+This guide shows you how to build a YAML validation from parts that are kept in separate files:
+collections of checks, threshold presets, and table definitions. Each part is written once and
+selected by name, and any of them can be changed when the validation is run.
+
+The composing is done by [Hydra](https://hydra.cc), which is an optional dependency:
+
+```bash
+pip install "pointblank[hydra]"
+```
+
+The keys, config groups, and built-in options are listed in the
+[YAML Reference](yaml-reference.qmd#composed-configurations).
+
+## Put Shared Checks in a Collection
+
+A check collection is a YAML file with a `steps:` list, written the same way as the steps of any
+YAML validation. It goes in a `pointblank/checks/` directory next to your validation configs:
+
+```
+config/
+├── orders.yaml
+└── pointblank/
+    └── checks/
+        └── ids.yaml
+```
+
+```yaml
+# config/pointblank/checks/ids.yaml
+# @package checks.ids
+steps:
+  - col_vals_not_null:
+      columns: ${vars.id_column}
+  - rows_distinct:
+      columns_subset: ${vars.id_column}
+```
+
+The first line is required. The name after `checks.` identifies the collection and must be
+different for each one.
+
+`${vars.id_column}` is replaced by the `id_column` value under `vars` in the config that selects
+the collection, so the same checks can be used on tables that name their ID column differently.
+
+## Select Collections in a Validation Config
+
+A validation config selects what it's made of in a `defaults:` list.
+
+```yaml
+# config/orders.yaml
+defaults:
+  - override /pointblank/tbl: small_table
+  - override /pointblank/thresholds: standard
+  - override /pointblank/checks:
+      - ids
+  - _self_
+
+vars:
+  id_column: a
+
+tbl_name: Orders
+steps:
+  - col_vals_gt:
+      columns: d
+      value: 100
+```
+
+Each `override` line selects one option of a config group (or a list of them, for
+`pointblank/checks`). Here `small_table` and `standard` are options that come with Pointblank, and
+`ids` is the collection defined above. Keep `_self_` as the last entry, so that values in this
+file take precedence over the selected options.
+
+The steps of the selected collections come first, in the order they're listed, followed by the
+`steps:` of the config itself.
+
+Run the config with `hydra_interrogate()`:
+
+```{python}
+#| echo: false
+#| output: false
+import tempfile
+from pathlib import Path
+
+config_dir = Path(tempfile.mkdtemp()) / "config"
+(config_dir / "pointblank" / "checks").mkdir(parents=True)
+
+(config_dir / "pointblank" / "checks" / "ids.yaml").write_text(
+    """# @package checks.ids
+steps:
+  - col_vals_not_null:
+      columns: ${vars.id_column}
+  - rows_distinct:
+      columns_subset: ${vars.id_column}
+"""
+)
+
+(config_dir / "orders.yaml").write_text(
+    """defaults:
+  - override /pointblank/tbl: small_table
+  - override /pointblank/thresholds: standard
+  - override /pointblank/checks:
+      - ids
+  - _self_
+
+vars:
+  id_column: a
+
+tbl_name: Orders
+steps:
+  - col_vals_gt:
+      columns: d
+      value: 100
+"""
+)
+```
+
+```{python}
+import pointblank as pb
+
+pb.hydra_interrogate(config_dir / "orders.yaml")
+```
+
+## Change a Selection or a Value for One Run
+
+Pass `overrides=` to select a different option of a group, or to set a single value. Overrides
+take precedence over what's in the file.
+
+```{python}
+pb.hydra_interrogate(
+    config_dir / "orders.yaml",
+    overrides=[
+        "pointblank/thresholds=strict",  # Select another option of a group
+        "thresholds.critical=0.5",       # Set one value
+        "vars.id_column=b",              # Point the collection at another column
+    ],
+)
+```
+
+A value that isn't in the composed config yet needs a `+` in front (e.g.,
+`"+vars.date_column=date"`).
+
+## Add Your Own Tables and Thresholds
+
+Options for the other config groups are files in the directory of that group. Each one starts
+with the `# @package` header of its group.
+
+```yaml
+# config/pointblank/tbl/orders_prod.yaml
+# @package _global_
+tbl: data/orders.parquet
+```
+
+```yaml
+# config/pointblank/thresholds/release.yaml
+# @package thresholds
+warning: 1
+critical: 0.02
+```
+
+Select them as `pointblank/tbl: orders_prod` and `pointblank/thresholds: release`. An option
+can't have the name of one that's built into Pointblank (such as `strict`).
+
+## Run a Composed Config from the Command Line
+
+`pb run` composes any YAML config that has a `defaults:` list. Overrides follow the file name.
+
+```bash
+pb run config/orders.yaml
+pb run config/orders.yaml pointblank/thresholds=strict thresholds.critical=0.5
+pb run config/orders.yaml vars.id_column=b --fail-on error
+```
+
+Quote an override that has brackets, since most shells give them a meaning of their own.
+
+Without a file, the config is made up of the options you select. Use `--config-dir` to say where
+your config groups are:
+
+```bash
+pb run pointblank/tbl=small_table 'pointblank/checks=[ids]' +vars.id_column=a --config-dir config
+```
+
+## See What a Config Composes To
+
+`pb compose` prints the composed config instead of running it:
+
+```bash
+pb compose config/orders.yaml pointblank/thresholds=strict
+```
+
+In Python, `hydra_compose()` returns it as a dictionary:
+
+```{python}
+import yaml
+
+composed = pb.hydra_compose(config_dir / "orders.yaml", overrides=["pointblank/thresholds=strict"])
+
+print(yaml.safe_dump(composed, sort_keys=False))
+```
+
+The result is a plain YAML config with nothing left to compose. If you save it to a file, it
+runs with `yaml_interrogate()` or `pb run` on a machine that doesn't have Hydra installed, and
+it can be reviewed as the full definition of what a run checks.
+
+## Keep Config Groups in Another Directory
+
+Config groups are looked up in the directory of the validation config. To use groups that are
+somewhere else, pass that directory as `config_dir=` (or `--config-dir` on the command line):
+
+```python
+pb.hydra_interrogate("orders.yaml", config_dir="shared/config")
+```
+
+To make check collections available to every project that installs a package, see
+[Sharing Checks in a Package](sharing-checks-in-a-package.qmd).
+
+## Use a Collection in Python Code
+
+`hydra_steps()` returns the steps of one collection as a `Steps` object, which you can add to a
+validation that's written in Python. Give the collection's variables as `vars=`.
+
+```{python}
+id_checks = pb.hydra_steps("ids", vars={"id_column": "a"}, config_dir=config_dir)
+
+(
+    pb.Validate(data=pb.load_dataset("small_table"))
+    .add_steps(id_checks)
+    .col_vals_gt(columns="d", value=100)
+    .interrogate()
+)
+```
+
+## Use Collections in a Contract
+
+A contract file with a `defaults:` list is composed when it's read with `Contract.from_yaml()`.
+Write the contract's fields at the top level of the file:
+
+```yaml
+# config/orders_contract.yaml
+defaults:
+  - override /pointblank/thresholds: strict
+  - override /pointblank/checks:
+      - ids
+  - _self_
+
+vars:
+  id_column: order_id
+
+name: orders
+version: "1.0.0"
+steps:
+  - col_vals_gt:
+      columns: amount
+      value: 0
+```
+
+```python
+orders_contract = pb.Contract.from_yaml("config/orders_contract.yaml")
+```
+
+## Use Collections in a Pipeline
+
+A pipeline file with a `defaults:` list is composed when it's read with `Pipeline.from_yaml()`.
+A pipeline has two contracts, so each one names the selected collections it uses in a `checks:`
+list. The name of a collection is the one in its `# @package checks.<name>` header.
+
+```yaml
+# config/orders_pipeline.yaml
+defaults:
+  - override /pointblank/thresholds: strict
+  - override /pointblank/checks:
+      - ids
+  - _self_
+
+vars:
+  id_column: order_id
+
+pipeline:
+  label: Orders
+source:
+  name: raw_orders
+  checks: [ids]
+target:
+  name: orders
+  checks: [ids]
+  steps:
+    - col_vals_gt:
+        columns: amount
+        value: 0
+```
+
+```python
+orders_pipeline = pb.Pipeline.from_yaml("config/orders_pipeline.yaml")
+```
+
+The steps of a contract's collections come before its own `steps:`. Every selected collection
+has to be used by at least one of the two contracts.
+
+## Use Python Objects in a Config
+
+To use a Python object as a value (a table, a preprocessing function, a custom check), write a
+mapping with a `_target_` key. The target is the import path of a callable, and the other keys
+are its arguments.
+
+```yaml
+tbl:
+  _target_: polars.read_parquet
+  source: data/orders.parquet
+
+steps:
+  - row_count_match:
+      count: 5
+      pre:
+        _target_: polars.DataFrame.head
+        _partial_: true
+        n: 5
+```
+
+Here `tbl` is what `polars.read_parquet("data/orders.parquet")` returns. With
+`_partial_: true` the callable isn't called, so `pre` is the function
+`polars.DataFrame.head` with `n=5` filled in.
+
+A target is imported and called whenever the config is run. Only run composed configs that you
+trust, as you would a Python script.
+
+## Allow Python Code
+
+Python code in `python:` blocks is handled as it is in any YAML config: it isn't run unless you
+pass `allow_python=True` to `hydra_interrogate()` or use `pb run --allow-python`. See
+[Allowing Python Code to Run](yaml-validation-workflows.qmd#allowing-python-code-to-run). This
+doesn't apply to `_target_`, which needs no permission.

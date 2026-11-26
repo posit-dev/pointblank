@@ -1,0 +1,165 @@
+---
+title: ccflow Integration
+jupyter: python3
+html-table-processing: none
+---
+
+```{python}
+#| echo: false
+#| output: false
+import pointblank as pb
+pb.config(report_incl_footer_timings=False)
+```
+
+This guide shows you how to run a Pointblank validation as a model in
+[ccflow](https://github.com/Point72/ccflow), a framework for configuring and running workflows.
+The validation is one that's [composed from a YAML configuration](../yaml/hydra-composition.qmd),
+and as a ccflow model it can be registered and run alongside the other models of a flow.
+
+## Installation
+
+The ccflow integration is an optional dependency. Install it with:
+
+```bash
+pip install "pointblank[ccflow]"
+```
+
+This adds `ccflow` and the packages that compose configurations.
+
+## Make a Model for a Validation
+
+A `ValidationModel` takes what `hydra_interrogate()` takes: the path of a configuration file,
+overrides, and a directory of config groups. Calling the model runs the validation.
+
+```{python}
+#| echo: false
+#| output: false
+import tempfile
+from pathlib import Path
+
+config_dir = Path(tempfile.mkdtemp()) / "config"
+config_dir.mkdir()
+
+(config_dir / "orders.yaml").write_text(
+    """defaults:
+  - override /pointblank/tbl: small_table
+  - override /pointblank/thresholds: standard
+  - _self_
+
+tbl_name: Orders
+steps:
+  - rows_distinct
+  - col_vals_gt:
+      columns: d
+      value: 100
+"""
+)
+```
+
+```{python}
+from ccflow import NullContext
+from pointblank.integrations.ccflow import ValidationModel
+
+orders_validation = ValidationModel(
+    config=config_dir / "orders.yaml",
+    overrides=["pointblank/thresholds=strict"],
+)
+
+result = orders_validation(NullContext())
+```
+
+The result has the interrogated validation as `validation`, and `all_passed` tells you whether
+every test unit of every step passed:
+
+```{python}
+result.all_passed
+```
+
+```{python}
+result.validation
+```
+
+## Register the Model in a ccflow Configuration
+
+In a ccflow configuration, a model is an entry with a `_target_`. Use
+`pointblank.integrations.ccflow.ValidationModel` as the target and give the model's fields as
+the other keys:
+
+```yaml
+orders_validation:
+  _target_: pointblank.integrations.ccflow.ValidationModel
+  config: config/orders.yaml
+  overrides:
+    - pointblank/thresholds=strict
+```
+
+Loading the configuration puts the model in the registry under its name:
+
+```{python}
+from ccflow import ModelRegistry
+
+registry = ModelRegistry.root()
+registry.load_config(
+    {
+        "orders_validation": {
+            "_target_": "pointblank.integrations.ccflow.ValidationModel",
+            "config": str(config_dir / "orders.yaml"),
+            "overrides": ["pointblank/thresholds=strict"],
+        }
+    }
+)
+
+registry["orders_validation"](NullContext()).all_passed
+```
+
+```{python}
+#| echo: false
+#| output: false
+registry.clear()
+```
+
+## Run the Model with `cfg_run()`
+
+ccflow's `cfg_run()` runs the model that a configuration names as its `callable`. Add the two
+keys it reads to the configuration:
+
+```yaml
+orders_validation:
+  _target_: pointblank.integrations.ccflow.ValidationModel
+  config: config/orders.yaml
+
+callable: /orders_validation
+context: {}
+```
+
+```{python}
+from ccflow.utils.hydra import cfg_run
+
+result = cfg_run(
+    {
+        "orders_validation": {
+            "_target_": "pointblank.integrations.ccflow.ValidationModel",
+            "config": str(config_dir / "orders.yaml"),
+        },
+        "callable": "/orders_validation",
+        "context": {},
+    }
+)
+
+result.validation.thresholds
+```
+
+```{python}
+#| echo: false
+#| output: false
+registry.clear()
+```
+
+A ccflow application that's configured with Hydra can run the model while its own configuration
+is active. The validation's configuration is composed separately from it.
+
+## Allow Python Code
+
+Python code in the validation's configuration isn't run unless the model has
+`allow_python=True`. See
+[Allowing Python Code to Run](../yaml/yaml-validation-workflows.qmd#allowing-python-code-to-run).

@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from pathlib import Path
 
     from narwhals.typing import IntoDataFrame
@@ -1149,7 +1150,12 @@ class Contract:
         )
 
     @classmethod
-    def from_yaml(cls, path: str | Path) -> Contract:
+    def from_yaml(
+        cls,
+        path: str | Path,
+        overrides: Iterable[str] | None = None,
+        config_dir: str | Path | None = None,
+    ) -> Contract:
         """Read a contract from a YAML file.
 
         Keeping contracts in YAML files separates the definition of "valid data" from the code
@@ -1182,10 +1188,20 @@ class Contract:
             warning: 1
         ```
 
+        A file with a `defaults:` list is composed with Hydra first, which lets a contract take
+        its steps from check collections and its thresholds from a preset (this needs the
+        `hydra` extra). Such a file has the contract's fields at its top level. See
+        [`hydra_compose()`](`pointblank.hydra_compose`) for how a file is composed.
+
         Parameters
         ----------
         path
             The path to the YAML file.
+        overrides
+            Hydra overrides for a file that has a `defaults:` list, such as
+            `"pointblank/thresholds=strict"`.
+        config_dir
+            A directory to add to the search path of a file that has a `defaults:` list.
 
         Returns
         -------
@@ -1269,6 +1285,17 @@ class Contract:
 
         if data is None:
             raise ValueError(f"YAML file is empty: {path}")
+
+        if "defaults" in data:
+            from pointblank.hydra import _compose_contract
+
+            return cls.from_dict(_compose_contract(yaml_path, overrides, config_dir))
+
+        if overrides or config_dir is not None:
+            raise ValueError(
+                "`overrides=` and `config_dir=` can only be used with a YAML file that has a "
+                "`defaults:` list."
+            )
 
         # If the YAML has a top-level 'contract' key, use that
         if "contract" in data:

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pointblank-example-checks"
+version = "0.1.0"
+description = "Example of a package that provides check collections to Pointblank"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["pointblank[hydra]"]
+
+# Puts `pointblank_example_checks/conf` on the Hydra search path, which makes the config group
+# options in it selectable from any composed Pointblank config
+[project.entry-points."hydra.lernaplugins"]
+pointblank-example-checks = "pkg:pointblank_example_checks.conf"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pointblank_example_checks"]

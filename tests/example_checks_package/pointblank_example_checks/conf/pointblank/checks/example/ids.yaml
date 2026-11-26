@@ -1,0 +1,6 @@
+# @package checks.example_ids
+steps:
+  - col_vals_not_null:
+      columns: ${vars.id_column}
+  - rows_distinct:
+      columns_subset: ${vars.id_column}
