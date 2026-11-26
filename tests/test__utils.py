@@ -813,6 +813,15 @@ def test_get_tbl_type_pyspark():
         assert result == "pyspark"
 
 
+@pytest.mark.parametrize("ibis_present", [True, False])
+def test_get_tbl_type_pyarrow(ibis_present):
+    """Test that PyArrow tables are detected whether or not Ibis is installed."""
+    pa = pytest.importorskip("pyarrow")
+
+    with patch("pointblank._utils._is_lib_present", return_value=ibis_present):
+        assert _get_tbl_type(pa.table({"x": [1, 2, 3]})) == "pyarrow"
+
+
 def test_get_column_dtype_raw_parameter():
     """Test the `raw=` parameter of _get_column_dtype()."""
 

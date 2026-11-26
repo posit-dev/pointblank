@@ -94,13 +94,16 @@ def _get_tbl_type(data: Any) -> str:
         except Exception as e:
             raise TypeError("The `data` object is not a DataFrame or Ibis Table.") from e
 
-        # Detect through regex if the table is a polars, pandas, or Spark DataFrame
+        # Detect through regex if the table is a polars, pandas, or Spark DataFrame, or a PyArrow
+        # table (which would otherwise only be detected when Ibis is installed)
         if re.search(r"polars", df_ns_str, re.IGNORECASE):
             return "polars"
         elif re.search(r"pandas", df_ns_str, re.IGNORECASE):
             return "pandas"
         elif re.search(r"pyspark", df_ns_str, re.IGNORECASE):
             return "pyspark"
+        elif re.search(r"pyarrow", df_ns_str, re.IGNORECASE):
+            return "pyarrow"
 
     # If ibis is present, then get the table's backend name
     ibis_present = _is_lib_present(lib_name="ibis")

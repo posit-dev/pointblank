@@ -3651,6 +3651,28 @@ def test_validation_pre_with_pyarrow_table() -> None:
     assert "syn_target_col" in step.notes
 
 
+def test_validation_with_segments_pyarrow_without_ibis(monkeypatch) -> None:
+    # Without Ibis (e.g., in Pyodide), PyArrow tables were typed as "unknown" and segmented steps
+    # failed with an evaluation error
+    from pointblank import _utils
+
+    is_lib_present = _utils._is_lib_present
+    monkeypatch.setattr(
+        "pointblank._utils._is_lib_present",
+        lambda lib_name: lib_name != "ibis" and is_lib_present(lib_name=lib_name),
+    )
+
+    tbl = pa.table({"a": [1, 2, 3, 4], "b": ["x", "y", "x", "z"]})
+    validation = Validate(tbl).col_vals_gt(columns="a", value=1, segments="b").interrogate()
+
+    assert [(step.segments, step.n, step.n_passed) for step in validation.validation_info] == [
+        (("b", "x"), 2, 1),
+        (("b", "y"), 1, 1),
+        (("b", "z"), 1, 1),
+    ]
+    assert all(step.eval_error is None for step in validation.validation_info)
+
+
 def test_apply_segments_unsupported_table_type_raises(monkeypatch) -> None:
     monkeypatch.setattr("pointblank.validate._get_tbl_type", lambda data: "unknown")
 
