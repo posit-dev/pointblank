@@ -20561,40 +20561,47 @@ class Validate:
                                 )
                         except ValueError as e:
                             # A comparison that can't be set up (e.g., a key column that isn't
-                            # in the target) is an evaluation error, not a failing comparison
+                            # in the target) is an evaluation error, not a failing comparison;
+                            # like other such steps, it ends here (before any thresholds are
+                            # checked against its missing counts)
                             validation.eval_error = True
                             validation._add_note(
                                 key=f"{assertion_type}_error", markdown=str(e), text=str(e)
                             )
-                            comparison = None
 
-                        if comparison is not None:
-                            n_units = comparison.n
-                            n_passed = comparison.n_passed
-                            if n_units == 0:
-                                # Two empty tables: keep a single unit so a schema failure counts
-                                n_units = 1
-                                n_passed = int(comparison.identical)
+                            end_time = datetime.datetime.now(datetime.timezone.utc)
+                            validation.proc_duration_s = (end_time - start_time).total_seconds()
+                            validation.time_processed = end_time.isoformat(timespec="milliseconds")
+                            validation.active = False
 
-                            validation.n = n_units
-                            validation.n_passed = n_passed
-                            validation.n_failed = n_units - n_passed
-                            validation.all_passed = validation.n_failed == 0
-                            # Samples of row values go into exports only if extracts are being
-                            # collected (`collect_extracts=False` keeps data, e.g. PII, out)
-                            validation.val_info = {
-                                "comparison": comparison,
-                                "samples": collect_extracts,
-                            }
+                            continue
 
-                            if collect_extracts:
-                                validation.extract = comparison._failing_rows(limit=extract_limit)
-                            if collect_tbl_checked:
-                                # Only usable for sundering if it's the same kind of table as
-                                # the validated data (not converted for the comparison)
-                                pass_tbl = comparison._target_pass_table()
-                                if pass_tbl is not None and type(pass_tbl) is type(data_tbl_step):
-                                    validation.tbl_checked = pass_tbl
+                        n_units = comparison.n
+                        n_passed = comparison.n_passed
+                        if n_units == 0:
+                            # Two empty tables: keep a single unit so a schema failure counts
+                            n_units = 1
+                            n_passed = int(comparison.identical)
+
+                        validation.n = n_units
+                        validation.n_passed = n_passed
+                        validation.n_failed = n_units - n_passed
+                        validation.all_passed = validation.n_failed == 0
+                        # Samples of row values go into exports only if extracts are being
+                        # collected (`collect_extracts=False` keeps data, e.g. PII, out)
+                        validation.val_info = {
+                            "comparison": comparison,
+                            "samples": collect_extracts,
+                        }
+
+                        if collect_extracts:
+                            validation.extract = comparison._failing_rows(limit=extract_limit)
+                        if collect_tbl_checked:
+                            # Only usable for sundering if it's the same kind of table as the
+                            # validated data (not converted for the comparison)
+                            pass_tbl = comparison._target_pass_table()
+                            if pass_tbl is not None and type(pass_tbl) is type(data_tbl_step):
+                                validation.tbl_checked = pass_tbl
 
                         results_tbl = None
 

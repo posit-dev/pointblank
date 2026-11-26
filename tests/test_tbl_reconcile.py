@@ -219,6 +219,18 @@ def test_setup_errors_are_eval_errors(kwargs, message):
     assert message in v.get_notes(i=1, format="text")[0]
 
 
+def test_setup_error_with_thresholds_is_an_eval_error():
+    # Checking the thresholds against the step's missing counts used to make `interrogate()` raise
+    v = (
+        pb.Validate(data=TARGET, thresholds=1)
+        .tbl_reconcile(tbl_compare=SOURCE, keys="region", measures="amount")
+        .interrogate()
+    )
+    step = _step(v)
+    assert (step.eval_error, step.active, step.warning) == (True, False, None)
+    assert v.get_tabular_report() is not None
+
+
 # ----------------------------------------------------------------------------------------------
 # Reporting and serialization
 # ----------------------------------------------------------------------------------------------

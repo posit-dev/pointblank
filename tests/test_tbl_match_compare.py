@@ -171,6 +171,27 @@ def test_invalid_comparison_is_an_eval_error_with_note():
     )
 
 
+@pytest.mark.parametrize(
+    "global_thresholds, step_thresholds",
+    [(None, None), (1, None), (None, 0.1), (pb.Thresholds(0.1, 0.2, 0.3), None)],
+)
+def test_invalid_comparison_with_thresholds_is_an_eval_error(global_thresholds, step_thresholds):
+    # With thresholds set, an evaluation error used to make `interrogate()` raise as the thresholds
+    # were checked against the step's missing counts (and the report couldn't be made either way)
+    v = (
+        pb.Validate(TARGET, thresholds=global_thresholds)
+        .tbl_match(SOURCE, keys="nope", thresholds=step_thresholds)
+        .col_vals_gt(columns="id", value=0)
+        .interrogate()
+    )
+    step = _step(v)
+    assert (step.eval_error, step.active) == (True, False)
+    assert (step.warning, step.error, step.critical) == (None, None, None)
+    assert _step(v, 2).all_passed
+    assert not v.all_passed()
+    assert "nope" in v.get_tabular_report().as_raw_html()
+
+
 def test_invalid_setting_values_raise_early():
     with pytest.raises(ValueError, match="schema="):
         pb.Validate(TARGET).tbl_match(SOURCE, schema="loose")
