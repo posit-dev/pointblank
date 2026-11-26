@@ -211,8 +211,8 @@ shape: (3, 2)
 |--------|-----|
 | str    | u32 |
 | "mid"  | 2   |
-| "low"  | 5   |
 | "high" | 6   |
+| "low"  | 5   |
 
 Then, we'll plug in the `data_transformed` DataFrame with a preprocessing function:
 
