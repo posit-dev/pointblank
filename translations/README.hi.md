@@ -503,7 +503,6 @@ ablation = (
 - [यूज़र गाइड](https://posit-dev.github.io/pointblank/user-guide/)
 - [API संदर्भ](https://posit-dev.github.io/pointblank/reference/)
 - [उदाहरण](https://posit-dev.github.io/pointblank/examples/)
-- [Pointblog](https://posit-dev.github.io/pointblank/blog/)
 
 ## समुदाय से जुड़ें
 

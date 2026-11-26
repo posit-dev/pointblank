@@ -504,7 +504,6 @@ Besuchen Sie unsere [Dokumentationswebsite](https://posit-dev.github.io/pointbla
 - [Das Benutzerhandbuch](https://posit-dev.github.io/pointblank/user-guide/)
 - [API-Referenz](https://posit-dev.github.io/pointblank/reference/)
 - [Beispiele](https://posit-dev.github.io/pointblank/examples/)
-- [Der Pointblog](https://posit-dev.github.io/pointblank/blog/)
 
 ## Werden Sie Teil der Community
 

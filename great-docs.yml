@@ -96,9 +96,12 @@ sections:
     dir: examples
     index: true
     index_columns: 2
-  - title: Blog
-    dir: blog
-    type: blog
+
+# The blog moved to the Posit Open Source site, so `blog/` holds pages that redirect the old URLs
+# there (the `navbar:` key of `blog/index.html` adds the Blog link)
+custom_pages:
+  dir: blog
+  output: blog
 
 # Author Information
 authors:
