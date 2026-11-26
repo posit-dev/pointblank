@@ -958,7 +958,7 @@ FinalActions(*actions) -> 'None'
     Actions : Define actions that run when a step exceeds a threshold.
     
 
-Schema(columns: 'str | list[str] | list[tuple[str, str]] | list[tuple[str]] | dict[str, str] | None' = None, tbl: 'Any | None' = None, **kwargs) -> 'None'
+Schema(columns: 'str | list[str] | list[tuple[str, str]] | list[tuple[str]] | list[tuple[str] | tuple[str, Any]] | dict[str, str] | None' = None, tbl: 'Any | None' = None, **kwargs) -> 'None'
 Definition of a schema object.
 
     The schema object defines the structure of a table. Once it is defined, the object can be used
@@ -5473,7 +5473,7 @@ col_vals_expr(self, expr: 'Any', pre: 'Callable | None' = None, segments: 'Segme
         by using `col_vals_expr()`. All test units passed, with no failing test units.
         
 
-col_sum_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_sum_gt(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column sum satisfy a greater than comparison?
 
     The `col_sum_gt()` validation method checks whether the sum of a column is greater than a
@@ -5500,9 +5500,11 @@ Does the column sum satisfy a greater than comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the sum to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the sum to be computed.
     value
         The target to compare the column sum against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -5713,7 +5715,7 @@ Does the column sum satisfy a greater than comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `446.7 > 451` (the sum of `revenue` in `current`, then in `baseline`), so it fails. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_sum_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_sum_lt(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column sum satisfy a less than comparison?
 
     The `col_sum_lt()` validation method checks whether the sum of a column is less than a
@@ -5740,9 +5742,11 @@ Does the column sum satisfy a less than comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the sum to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the sum to be computed.
     value
         The target to compare the column sum against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -5953,7 +5957,7 @@ Does the column sum satisfy a less than comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `446.7 < 451` (the sum of `revenue` in `current`, then in `baseline`), so it passes. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_sum_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_sum_ge(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column sum satisfy a greater than or equal to comparison?
 
     The `col_sum_ge()` validation method checks whether the sum of a column is at least a
@@ -5980,9 +5984,11 @@ Does the column sum satisfy a greater than or equal to comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the sum to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the sum to be computed.
     value
         The target to compare the column sum against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -6193,7 +6199,7 @@ Does the column sum satisfy a greater than or equal to comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `446.7 >= 451` (the sum of `revenue` in `current`, then in `baseline`), so it fails. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_sum_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_sum_le(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column sum satisfy a less than or equal to comparison?
 
     The `col_sum_le()` validation method checks whether the sum of a column is at most a
@@ -6220,9 +6226,11 @@ Does the column sum satisfy a less than or equal to comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the sum to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the sum to be computed.
     value
         The target to compare the column sum against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -6433,7 +6441,7 @@ Does the column sum satisfy a less than or equal to comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `446.7 <= 451` (the sum of `revenue` in `current`, then in `baseline`), so it passes. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_sum_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_sum_eq(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column sum satisfy an equal to comparison?
 
     The `col_sum_eq()` validation method checks whether the sum of a column equals a
@@ -6460,9 +6468,11 @@ Does the column sum satisfy an equal to comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the sum to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the sum to be computed.
     value
         The target to compare the column sum against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -6673,7 +6683,7 @@ Does the column sum satisfy an equal to comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `446.7 == 451` (the sum of `revenue` in `current`, then in `baseline`), so it fails. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_avg_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_avg_gt(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column average satisfy a greater than comparison?
 
     The `col_avg_gt()` validation method checks whether the average of a column is greater than a
@@ -6700,9 +6710,11 @@ Does the column average satisfy a greater than comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the average to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the average to be computed.
     value
         The target to compare the column average against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -6913,7 +6925,7 @@ Does the column average satisfy a greater than comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `111.675 > 112.75` (the average of `revenue` in `current`, then in `baseline`), so it fails. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_avg_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_avg_lt(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column average satisfy a less than comparison?
 
     The `col_avg_lt()` validation method checks whether the average of a column is less than a
@@ -6940,9 +6952,11 @@ Does the column average satisfy a less than comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the average to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the average to be computed.
     value
         The target to compare the column average against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -7153,7 +7167,7 @@ Does the column average satisfy a less than comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `111.675 < 112.75` (the average of `revenue` in `current`, then in `baseline`), so it passes. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_avg_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_avg_ge(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column average satisfy a greater than or equal to comparison?
 
     The `col_avg_ge()` validation method checks whether the average of a column is at least a
@@ -7180,9 +7194,11 @@ Does the column average satisfy a greater than or equal to comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the average to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the average to be computed.
     value
         The target to compare the column average against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -7393,7 +7409,7 @@ Does the column average satisfy a greater than or equal to comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `111.675 >= 112.75` (the average of `revenue` in `current`, then in `baseline`), so it fails. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_avg_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_avg_le(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column average satisfy a less than or equal to comparison?
 
     The `col_avg_le()` validation method checks whether the average of a column is at most a
@@ -7420,9 +7436,11 @@ Does the column average satisfy a less than or equal to comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the average to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the average to be computed.
     value
         The target to compare the column average against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -7633,7 +7651,7 @@ Does the column average satisfy a less than or equal to comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `111.675 <= 112.75` (the average of `revenue` in `current`, then in `baseline`), so it passes. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_avg_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_avg_eq(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column average satisfy an equal to comparison?
 
     The `col_avg_eq()` validation method checks whether the average of a column equals a
@@ -7660,9 +7678,11 @@ Does the column average satisfy an equal to comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the average to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the average to be computed.
     value
         The target to compare the column average against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -7873,7 +7893,7 @@ Does the column average satisfy an equal to comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `111.675 == 112.75` (the average of `revenue` in `current`, then in `baseline`), so it fails. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_sd_gt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_sd_gt(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column standard deviation satisfy a greater than comparison?
 
     The `col_sd_gt()` validation method checks whether the standard deviation of a column is greater than a
@@ -7900,9 +7920,11 @@ Does the column standard deviation satisfy a greater than comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the standard deviation to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the standard deviation to be computed.
     value
         The target to compare the column standard deviation against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -8113,7 +8135,7 @@ Does the column standard deviation satisfy a greater than comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `25.0684 > 26.1454` (the standard deviation of `revenue` in `current`, then in `baseline`), so it fails. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_sd_lt(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_sd_lt(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column standard deviation satisfy a less than comparison?
 
     The `col_sd_lt()` validation method checks whether the standard deviation of a column is less than a
@@ -8140,9 +8162,11 @@ Does the column standard deviation satisfy a less than comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the standard deviation to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the standard deviation to be computed.
     value
         The target to compare the column standard deviation against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -8353,7 +8377,7 @@ Does the column standard deviation satisfy a less than comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `25.0684 < 26.1454` (the standard deviation of `revenue` in `current`, then in `baseline`), so it passes. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_sd_ge(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_sd_ge(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column standard deviation satisfy a greater than or equal to comparison?
 
     The `col_sd_ge()` validation method checks whether the standard deviation of a column is at least a
@@ -8380,9 +8404,11 @@ Does the column standard deviation satisfy a greater than or equal to comparison
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the standard deviation to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the standard deviation to be computed.
     value
         The target to compare the column standard deviation against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -8593,7 +8619,7 @@ Does the column standard deviation satisfy a greater than or equal to comparison
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `25.0684 >= 26.1454` (the standard deviation of `revenue` in `current`, then in `baseline`), so it fails. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_sd_le(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_sd_le(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column standard deviation satisfy a less than or equal to comparison?
 
     The `col_sd_le()` validation method checks whether the standard deviation of a column is at most a
@@ -8620,9 +8646,11 @@ Does the column standard deviation satisfy a less than or equal to comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the standard deviation to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the standard deviation to be computed.
     value
         The target to compare the column standard deviation against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -8833,7 +8861,7 @@ Does the column standard deviation satisfy a less than or equal to comparison?
 
     With `reference=` set, leaving out `value=` compares against the same column in the reference table. Step 1 checks `25.0684 <= 26.1454` (the standard deviation of `revenue` in `current`, then in `baseline`), so it passes. Step 2 names the target column with [`ref()`](`pointblank.ref`), which you'd need if the column had a different name in the reference table, and allows a 5% tolerance, so it passes. Comparing each new load of a table with the last one known to be good like this catches drift that no single row would reveal.
 
-col_sd_eq(self: 'Validate', columns: 'str | Collection[str]', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
+col_sd_eq(self: 'Validate', columns: 'str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals', value: 'float | int | Column | ReferenceColumn | None' = None, tol: 'float' = 0, thresholds: 'int | float | bool | tuple | dict | Thresholds | None' = None, brief: 'str | bool | None' = None, actions: 'Actions | None' = None, active: 'bool | Callable' = True, dimension: 'str | None' = None) -> 'Validate'
 Does the column standard deviation satisfy an equal to comparison?
 
     The `col_sd_eq()` validation method checks whether the standard deviation of a column equals a
@@ -8860,9 +8888,11 @@ Does the column standard deviation satisfy an equal to comparison?
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the standard deviation to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the standard deviation to be computed.
     value
         The target to compare the column standard deviation against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -10792,7 +10822,8 @@ tbl_match(self, tbl_compare: 'Any', keys: 'str | list[str] | None' = None, colum
             How schema differences affect the result. With `"strict"` (the default), any schema
             difference (other than renames given in `column_map=`) means the tables don't match,
             and every test unit fails. With `"common"`, only the shared columns are compared and
-            schema differences are reported without failing any test units.
+            schema differences are reported without failing any test units. Without `keys=`,
+            there must be at least one shared column for any test unit to pass.
         dup_keys
             Rows whose key appears more than once in either table always fail. With `"flag"` (the
             default), the step report lists the duplicated keys. With `"compare"`, the step report
@@ -17693,12 +17724,14 @@ missing_vals_tbl(data: 'Any', missing: 'dict[str, MissingSpec] | None' = None, a
 
     By default, missingness is treated as binary (a value is either Null or it isn't) and the
     function renders a sector-based heatmap of the proportion of Null values across the rows of each
-    column. When a `missing=` mapping of columns to [`MissingSpec`](`pointblank.MissingSpec`) objects
+    column. A `NaN` in a floating-point column counts as Null, as it does in
+    [`col_vals_null()`](`pointblank.Validate.col_vals_null`) and the other checks for missing
+    values. When a `missing=` mapping of columns to [`MissingSpec`](`pointblank.MissingSpec`) objects
     is supplied, the function instead renders a *structured missingness* breakdown: one row per
     column with the count and percentage of complete values and of each missing *reason* (e.g.,
     `refused`, `not_asked`). Declared (coded) reasons are grouped under a "Missing Reasons" spanner
-    and keep their raw input form as labels; actual `Null`/`None`/`NA` values (which are not part of
-    the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so
+    and keep their raw input form as labels; actual `Null`/`None`/`NA`/`NaN` values (which are not
+    part of the spec) are tallied in a fixed "Null" column at the far right (styled like "Complete"), so
     they aren't mistaken for declared reasons.
 
     Note that supplying `missing=` produces a *different report* than the default view: it is a
@@ -18358,7 +18391,8 @@ compare(source: 'Any', target: 'Any', keys: 'str | list[str] | None' = None, col
         How schema differences affect the result. With `"strict"` (the default), any schema
         difference (other than renames given in `column_map=`) means the tables don't match, and
         every row counts as failing. With `"common"`, only the shared columns are compared and
-        schema differences are reported without failing rows.
+        schema differences are reported without failing rows. Without `keys=`, there must be at
+        least one shared column for any row to pass.
     dup_keys
         Rows whose key appears more than once in either table can't be aligned unambiguously, so
         they always get the `"dup_key"` status. With `"flag"` (the default), they are only flagged
@@ -18399,6 +18433,12 @@ compare(source: 'Any', target: 'Any', keys: 'str | list[str] | None' = None, col
     In multiset mode (`keys="*"`), a row is either present in the other table or not, so there are
     no `"changed"` or `"dup_key"` rows. Each distinct row matches as many times as it occurs in
     both tables, and any surplus copies count as `"missing"` or `"extra"`.
+
+    Without keys (positional or multiset mode), rows are aligned through their values alone, so the
+    comparison needs at least one column in common. If there's none (e.g., two unrelated tables
+    compared with `schema="common"`), the rows keep their statuses but none of them pass, the same
+    as with a failed strict schema check. With `keys=`, a comparison of the keys alone is still
+    meaningful (it checks which keys are present in both tables), so it passes as usual.
 
     Large Tables
     ------------
