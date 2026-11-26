@@ -4472,7 +4472,9 @@ class _ValidationInfo:
 
         return cls(
             assertion_type=assertion_type,
-            column=_resolve_columns(columns),
+            # A `col()` or selector is kept as is, to be expanded into a step per column at
+            # interrogation
+            column=columns if isinstance(columns, Column) else _resolve_columns(columns),
             values={"value": value, "tol": tol},
             thresholds=_normalize_thresholds_creation(thresholds),
             brief=_transform_auto_brief(brief=brief),
@@ -5207,7 +5209,9 @@ def _validation_info_to_step(
     elif isinstance(vi.values, dict) and "value" in vi.values:
         # Aggregate methods (col_sum_eq, col_avg_gt, ...) share a {"value", "tol"} shape.
         _columns_param()
-        params["value"] = vi.values["value"]
+        # (no `value=` means the same column in the reference data)
+        if vi.values["value"] is not None:
+            params["value"] = vi.values["value"]
         if vi.values.get("tol"):
             params["tol"] = vi.values["tol"]
     else:
@@ -6611,7 +6615,7 @@ class Validate:
         self,
         *,
         assertion_type: str,
-        columns: str | Collection[str],
+        columns: str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value,
         tol=0,
         thresholds=None,
@@ -6649,7 +6653,8 @@ class Validate:
         assertion_type
             The type of assertion (e.g., "col_sum_eq", "col_avg_gt").
         columns
-            Column name or collection of column names to validate.
+            Column name or collection of column names to validate, or a `col()` or column selector
+            (resolved at interrogation into a step per column).
         value
             The target value to compare against. Can be:
             - A numeric literal (int or float)
@@ -6683,14 +6688,20 @@ class Validate:
         ValueError
             If `value` is None and no reference data is set on the Validate object.
         """
-        if isinstance(value, Column) and not isinstance(value, ColumnLiteral):
+        if isinstance(value, (ColumnSelector, nw.selectors.Selector)) or (
+            isinstance(value, Column) and not isinstance(value, ColumnLiteral)
+        ):
             raise ValueError(
                 f"`value=` in {assertion_type}() accepts `col()` with a single column name only "
                 "(e.g., `col('b')`), not a column selector."
             )
-        if isinstance(columns, str):
-            columns = [columns]
-        for column in columns:
+        # A collection of names (e.g., a tuple) is checked as a list, so that a `col()` or selector
+        # inside it gets the same clear error as in other methods
+        if not isinstance(columns, (str, Column, ColumnSelector, nw.selectors.Selector)):
+            columns = list(columns)
+        _check_column(column=columns)
+
+        for column in cast("Collection[Column] | Collection[str]", _resolve_columns(columns)):
             # If value is None, default to referencing the same column from reference data
             resolved_value = value
             if value is None:
@@ -6701,7 +6712,9 @@ class Validate:
                         "set reference data on the Validate object using "
                         "Validate(data=..., reference=...)."
                     )
-                resolved_value = ReferenceColumn(column_name=column)
+                # (for a `col()` or selector, this is done for each column at interrogation)
+                if isinstance(column, str):
+                    resolved_value = ReferenceColumn(column_name=column)
 
             val_info = _ValidationInfo.from_agg_validator(
                 assertion_type=assertion_type,
@@ -20639,7 +20652,7 @@ class Validate:
                         vec = nw.from_native(data_tbl_step).select(cast(Any, column))
                         real = agg(vec)
 
-                        raw_value = value["value"]
+                        raw_value = _agg_target_value(value, column)
                         tol = value["tol"]
 
                         # Handle ReferenceColumn: compute target from reference data
@@ -25674,7 +25687,7 @@ class Validate:
             # Handle aggregation methods (col_sum_gt, col_avg_eq, etc.)
             elif is_valid_agg(assertion_type[i]):  # pragma: no cover
                 # Extract the value and tolerance from the values dict
-                agg_value = value.get("value")  # pragma: no cover
+                agg_value = _agg_target_value(value, columns[i])  # pragma: no cover
                 tol_value = value.get("tol", 0)  # pragma: no cover
 
                 # Format the value (could be a number, Column, or ReferenceColumn)
@@ -27125,7 +27138,11 @@ class Validate:
             for column in columns_resolved:
                 new_validation = copy.deepcopy(validation)
 
-                new_validation.column = column
+                # Aggregate steps (e.g., `col_sum_gt()`) store the column in a list, as they do
+                # when a column name is given
+                new_validation.column = (
+                    [column] if is_valid_agg(cast(str, validation.assertion_type)) else column
+                )
                 new_validation.column_spec = column_expr
 
                 expanded_validation_info.append(new_validation)
@@ -28762,6 +28779,23 @@ def _create_text_comparison(
     )
 
 
+def _agg_target_value(values: Any, column: Any) -> Any:
+    """
+    Get the `value=` of an aggregate step (e.g., `col_sum_gt()`).
+
+    A step without a `value=` (given reference data) compares against the same column in the
+    reference data. For a `col()` or selector in `columns=`, that column is only known once the step
+    has been expanded into a step per column at interrogation, so `value=` is kept as `None` in the
+    plan and the reference column is filled in here.
+    """
+    value = values.get("value") if isinstance(values, dict) else values
+    if value is None:
+        name = column[0] if isinstance(column, list) and len(column) == 1 else column
+        if isinstance(name, str):
+            return ReferenceColumn(column_name=name)
+    return value
+
+
 def _create_text_agg(
     lang: str,
     assertion_type: str,
@@ -28795,7 +28829,7 @@ def _create_text_agg(
 
     column_text = _prep_column_text(column=column)
 
-    value = values.get("value", values) if isinstance(values, dict) else values
+    value = _agg_target_value(values, column)
     values_text = _prep_values_text(values=str(value), lang=lang, limit=3)
 
     # "Expect that the {agg} of {column} should be {operator} {value}."
@@ -34109,9 +34143,11 @@ def _generate_agg_docstring(name: str) -> str:
     Parameters
     ----------
     columns
-        A single column or a list of columns to validate. If multiple columns are supplied,
-        there will be a separate validation step generated for each column. The columns must
-        contain numeric data for the {agg_name} to be computed.
+        A single column or a list of columns to validate. Can also use
+        [`col()`](`pointblank.col`) or a column selector (e.g.,
+        [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+        columns are supplied or resolved, there will be a separate validation step generated for
+        each column. The columns must contain numeric data for the {agg_name} to be computed.
     value
         The target to compare the column {agg_name} against. This can be: (1) a number, (2) a
         [`col()`](`pointblank.col`) object naming another column, in which case the target is the
@@ -34351,7 +34387,7 @@ def make_agg_validator(name: str):
 
     def agg_validator(
         self: Validate,
-        columns: str | Collection[str],
+        columns: str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value: float | int | Column | ReferenceColumn | None = None,
         tol: float = 0,
         thresholds: int | float | bool | tuple | dict | Thresholds | None = None,

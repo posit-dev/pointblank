@@ -231,7 +231,7 @@ class Validate:
         self,
         *,
         assertion_type: str,
-        columns: str | Collection[str],
+        columns: str | Collection[str] | Column | ColumnSelector | ColumnSelectorNarwhals,
         value,
         tol: int = 0,
         thresholds=None,

@@ -1548,6 +1548,122 @@ def test_col_value_selector_raises():
 
     with pytest.raises(ValueError, match="single column name"):
         Validate(data).col_sum_gt("a", col(starts_with("b")))
+    with pytest.raises(ValueError, match="single column name"):
+        Validate(data).col_sum_gt("a", starts_with("b"))
+
+
+# ──────────────────────────────────────────────────────────────────────
+# `col()` and column selectors in `columns=`
+# ──────────────────────────────────────────────────────────────────────
+
+
+def _agg_steps(v: Validate) -> list[tuple]:
+    return [(step.column, step.n_passed, step.eval_error) for step in v.validation_info]
+
+
+@pytest.mark.parametrize("backend", ["polars", "pandas", "duckdb"])
+def test_columns_col_and_selectors(backend: str):
+    import ibis
+    import narwhals.selectors as ncs
+
+    from pointblank import col, starts_with
+
+    data = pl.DataFrame({"a1": [1, 2, 3], "a2": [10, 20, 30], "s": ["x", "y", "z"]})
+    if backend == "pandas":
+        data = data.to_pandas()
+    elif backend == "duckdb":
+        data = ibis.memtable(data)
+
+    v = (
+        Validate(data)
+        .col_sum_gt(col("a1"), 5)
+        .col_sum_gt(starts_with("a"), 10)
+        .col_avg_le(col(starts_with("a")), 10)
+        .col_sd_gt(ncs.numeric(), 0)
+        .col_sum_lt(("a1", "a2"), 10)
+        .interrogate()
+    )
+
+    # A step is made for each column, which is stored in a list (as for a column name)
+    assert _agg_steps(v) == [
+        (["a1"], 1, None),
+        (["a1"], 0, None),
+        (["a2"], 1, None),
+        (["a1"], 1, None),
+        (["a2"], 0, None),
+        (["a1"], 1, None),
+        (["a2"], 1, None),
+        (["a1"], 1, None),
+        (["a2"], 0, None),
+    ]
+    assert v.get_tabular_report() is not None
+    assert v.get_step_report(i=2) is not None
+
+
+def test_columns_selector_with_col_value():
+    from pointblank import col, starts_with
+
+    data = pl.DataFrame({"a1": [1, 2, 3], "a2": [10, 20, 30], "b": [2, 2, 2]})
+    v = Validate(data).col_sum_gt(starts_with("a"), col("b")).interrogate()
+
+    assert _agg_steps(v) == [(["a1"], 0, None), (["a2"], 1, None)]
+    assert [step.val_info["target"] for step in v.validation_info] == [6, 6]
+
+
+def test_columns_selector_infers_reference_columns():
+    from pointblank import starts_with
+
+    data = pl.DataFrame({"a1": [1, 2, 3], "a2": [10, 20, 30]})
+    reference = pl.DataFrame({"a1": [1, 2, 3], "a2": [10, 20, 31]})
+
+    v = Validate(data, reference=reference).col_sum_eq(starts_with("a")).interrogate()
+
+    # Each column is compared with the same column in the reference data
+    assert _agg_steps(v) == [(["a1"], 1, None), (["a2"], 0, None)]
+    assert [step.val_info["target"] for step in v.validation_info] == [6, 61]
+    assert "ref('a2')" in v.get_tabular_report().as_raw_html()
+    assert "ref('a2')" in v.validation_info[1].autobrief
+
+    # The plan keeps the selector without a `value=`, so the reference columns are found again
+    # when the steps are interrogated again or added to a validation of a different table
+    assert _agg_steps(v.interrogate()) == [(["a1"], 1, None), (["a2"], 0, None)]
+    v_new = (
+        Validate(data.rename({"a2": "a3"}), reference=reference.rename({"a2": "a3"}))
+        .add_steps(v)
+        .interrogate()
+    )
+    assert _agg_steps(v_new) == [(["a1"], 1, None), (["a3"], 0, None)]
+
+    # The serialized plan leaves out `value=` for these steps, as the method was called
+    with pytest.warns(UserWarning, match="reference="):
+        code = v.to_code()
+    assert '.col_sum_eq(columns="a2")' in code
+
+
+def test_columns_selector_without_reference_data_raises():
+    from pointblank import starts_with
+
+    data = pl.DataFrame({"a1": [1, 2, 3]})
+    with pytest.raises(ValueError, match="'value' parameter is required"):
+        Validate(data).col_sum_eq(starts_with("a"))
+
+
+def test_columns_selector_matching_no_columns_is_eval_error():
+    from pointblank import starts_with
+
+    data = pl.DataFrame({"a1": [1, 2, 3]})
+    v = Validate(data).col_sum_gt(starts_with("z"), 0).interrogate()
+
+    assert v.validation_info[0].eval_error is True
+    assert v.get_note(i=1, key="no_columns_resolved") is not None
+
+
+def test_columns_list_with_col_raises():
+    from pointblank import col
+
+    data = pl.DataFrame({"a1": [1, 2, 3], "b": [1, 2, 3]})
+    with pytest.raises(ValueError, match="all elements must be strings"):
+        Validate(data).col_sum_gt(["a1", col("b")], 0)
 
 
 # ──────────────────────────────────────────────────────────────────────
