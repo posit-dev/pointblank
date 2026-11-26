@@ -2168,7 +2168,7 @@ A <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s write a contract for a daily orders extract. The schema fixes the four columns and their types, and the steps say that IDs must be present, each order must appear once, amounts must be positive, and the status must be one of three known values. Ownership and versioning go in the metadata, and the thresholds flag any failing test unit as a warning and a failure rate of 10% or more as an error.</p>
-<div id="7639fb91" class="cell" data-execution_count="2">
+<div id="d253d716" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2200,7 +2200,7 @@ A <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls
 </div>
 <p>The contract itself is just a definition. Printing it shows a short summary: the name, direction, version, whether a schema is set, and the number of steps.</p>
 <p>Now let’s apply the contract to a day’s extract that meets every expectation. The <a href="../reference/pointblank.Contract.validate.html" class="gdls-link"><code>validate()</code></a> method compiles the contract against the table and interrogates it, returning a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object that displays as a validation report.</p>
-<div id="480c7b25" class="cell" data-execution_count="3">
+<div id="478d58f6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>orders_day_1 <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="st">"A1"</span>, <span class="st">"A2"</span>, <span class="st">"A3"</span>, <span class="st">"A4"</span>],</span>
@@ -2739,7 +2739,7 @@ tr { background-color: transparent; }
 </div>
 <p>The report header shows the label built from the contract (<code>Contract: orders v1.2.0</code>) along with the owner, consumers, and version. The first step is the schema check, followed by one step per contract rule. The <a href="../reference/Validate.col_vals_not_null.html#pointblank.Validate.col_vals_not_null" class="gdls-link gdls-code">col_vals_not_null</a> step names two columns, so it becomes two validation steps. All six steps pass.</p>
 <p>The next day’s extract has problems: a missing customer ID, a repeated order ID, a negative amount, and a status the contract doesn’t allow. The same contract catches all of them.</p>
-<div id="8549fe51" class="cell" data-execution_count="4">
+<div id="e18c65bf" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>orders_day_2 <span class="op">=</span> pl.DataFrame(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"order_id"</span>: [<span class="st">"A5"</span>, <span class="st">"A6"</span>, <span class="st">"A6"</span>, <span class="st">"A8"</span>],</span>
@@ -3279,14 +3279,14 @@ tr { background-color: transparent; }
 </div>
 </div>
 <p>The schema still matches, but four of the rule steps have failing test units. With only four rows, one failure is already 25% of the table, so those steps exceed both the warning and the error thresholds. The <a href="../reference/Validate.rows_distinct.html#pointblank.Validate.rows_distinct" class="gdls-link gdls-code">rows_distinct</a> step counts two failures because both rows with order <code>"A6"</code> are duplicates. Since the result is an ordinary <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, you can check it in code, for example to stop a scheduled job:</p>
-<div id="c697ad62" class="cell" data-execution_count="5">
+<div id="14190549" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>validation.all_passed()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>False</code></pre>
 </div>
 </div>
 <p>To share the contract with another team or keep it under version control, write it out as YAML. Called without a path, <a href="../reference/pointblank.Contract.to_yaml.html" class="gdls-link"><code>to_yaml()</code></a> returns the YAML text.</p>
-<div id="d2ab1f1f" class="cell" data-execution_count="6">
+<div id="d818e02b" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(orders_contract.to_yaml())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>contract:
@@ -3327,7 +3327,7 @@ tr { background-color: transparent; }
 </div>
 <p>The YAML lists the metadata, schema, steps, and thresholds in a form that’s easy to read and review. <a href="../reference/pointblank.Contract.from_yaml.html" class="gdls-link"><code>from_yaml()</code></a> reads it back into an equivalent <a href="../reference/Contract.html#pointblank.Contract" class="gdls-link gdls-code">Contract</a>.</p>
 <p>Finally, a contract can be the starting point for a stricter, local validation. Here, <a href="../reference/pointblank.Contract.to_validate.html" class="gdls-link"><code>to_validate()</code></a> compiles the contract without interrogating, and we add one more check (orders of 100 or less) before calling <a href="../reference/Validate.interrogate.html#pointblank.Validate.interrogate" class="gdls-link"><code>interrogate()</code></a>.</p>
-<div id="3250e1c4" class="cell" data-execution_count="7">
+<div id="8d626234" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    orders_contract.to_validate(orders_day_1)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    .col_vals_le(columns<span class="op">=</span><span class="st">"amount"</span>, value<span class="op">=</span><span class="dv">100</span>)</span>
