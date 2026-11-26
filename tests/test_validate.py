@@ -6020,6 +6020,30 @@ def test_rows_distinct_complete_column_selectors(tbl_type) -> None:
     assert not any(step.eval_error for step in steps)
 
 
+@pytest.mark.parametrize("tbl_type", ["polars", "pandas", "duckdb"])
+def test_rows_distinct_complete_tuple_columns_subset(tbl_type) -> None:
+    """A tuple of names in `columns_subset=` works like a list."""
+    tbl = pl.DataFrame({"k": [1, 2, 2], "b": [3, 4, 4], "c": [None, 1, 2]})
+    if tbl_type == "pandas":
+        tbl = tbl.to_pandas()
+    elif tbl_type == "duckdb":
+        tbl = ibis.memtable(tbl)
+
+    validation = (
+        Validate(tbl)
+        .rows_distinct(columns_subset=("k", "b"))
+        .rows_complete(columns_subset=("b", "c"))
+        .interrogate()
+    )
+
+    steps = validation.validation_info
+    assert [step.column for step in steps] == [["k", "b"], ["b", "c"]]
+    assert [step.n_failed for step in steps] == [2, 1]
+    assert not any(step.eval_error for step in steps)
+    # The extract of duplicate rows is limited to the subset (this used to raise)
+    assert len(validation.get_data_extracts(i=1, frame=True)) == 2
+
+
 def test_rows_distinct_column_selector_resolution() -> None:
     """A `columns_subset=` selector is resolved after `pre=`, and kept for a new table."""
     tbl = pl.DataFrame({"a1": [1, 1], "a2": [2, 2], "b": [1, 2]})
