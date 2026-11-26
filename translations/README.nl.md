@@ -504,7 +504,6 @@ Bezoek onze [documentatiesite](https://posit-dev.github.io/pointblank) voor:
 - [De gebruikersgids](https://posit-dev.github.io/pointblank/user-guide/)
 - [De API-referentie](https://posit-dev.github.io/pointblank/reference/)
 - [De voorbeelden](https://posit-dev.github.io/pointblank/examples/)
-- [De Pointblog](https://posit-dev.github.io/pointblank/blog/)
 
 ## Word lid van de gemeenschap
 

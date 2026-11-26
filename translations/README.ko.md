@@ -504,7 +504,6 @@ ablation = (
 - [사용자 가이드](https://posit-dev.github.io/pointblank/user-guide/)
 - [API 참조](https://posit-dev.github.io/pointblank/reference/)
 - [예제](https://posit-dev.github.io/pointblank/examples/)
-- [Pointblog](https://posit-dev.github.io/pointblank/blog/)
 
 ## 커뮤니티 참여
 
