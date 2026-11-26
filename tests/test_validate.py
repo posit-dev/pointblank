@@ -152,6 +152,7 @@ from pointblank.validate import (
     Validate,
     write_file,
     _DATASET_DATE_COLUMNS,
+    _create_label_html,
     _create_table_time_html,
     _create_table_type_html,
     _create_thresholds_html,
@@ -13643,6 +13644,27 @@ def test_create_table_time_html() -> None:
 
     assert _create_table_time_html(time_start=None, time_end=None) == ""
     assert "div" in _create_table_time_html(time_start=datetime_0, time_end=datetime_1_min_later)
+
+
+def test_create_label_html() -> None:
+    start_time = datetime.datetime(2021, 1, 1, 12, 30, 15, 123456)
+
+    assert ">my label</span>" in _create_label_html(label="my label", start_time=start_time)
+    assert ">2021-01-01|12:30:15</span>" in _create_label_html(label=None, start_time=start_time)
+    assert "></span>" in _create_label_html(label=None, start_time=None)
+    assert "None" not in _create_label_html(label=None, start_time=None)
+
+
+def test_tabular_report_without_label_before_interrogation() -> None:
+    validation = Validate(pl.DataFrame({"a": [1]})).col_vals_gt(columns="a", value=0)
+    assert ">None<" not in validation.get_tabular_report().as_raw_html()
+
+    # After interrogation, the start time is used as the label
+    validation.interrogate()
+    assert ">None<" not in validation.get_tabular_report().as_raw_html()
+    assert validation.time_start is not None
+    start_time_label = str(validation.time_start).split(".")[0].replace(" ", "|")
+    assert f">{start_time_label}</span>" in validation.get_tabular_report().as_raw_html()
 
 
 def test_create_table_type_html() -> None:

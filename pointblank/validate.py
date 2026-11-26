@@ -25985,7 +25985,7 @@ class Validate:
         )
 
         # Create the label, table type, and thresholds HTML fragments
-        label_html = _create_label_html(label=self.label, start_time=cast(str, self.time_start))
+        label_html = _create_label_html(label=self.label, start_time=self.time_start)
         table_type_html = _create_table_type_html(tbl_type=tbl_info, tbl_name=self.tbl_name)
         thresholds_html = _create_thresholds_html(
             thresholds=thresholds, locale=locale, df_lib=df_lib
@@ -30876,8 +30876,13 @@ def _create_notes_html(validation_info: list) -> str:
     return notes_markdown
 
 
-def _create_label_html(label: str | None, start_time: str) -> str:
+def _create_label_html(label: str | None, start_time: datetime.datetime | str | None) -> str:
     if label is None:
+        # Without a label, use the start time of the interrogation (and leave the label empty if
+        # there hasn't been one yet, rather than showing "None")
+        if start_time is None:
+            start_time = ""
+
         # Remove the decimal and everything beyond that
         start_time = str(start_time).split(".")[0]
 
