@@ -4,7 +4,7 @@ Add the steps from one or more [Steps](../reference/Steps.md#pointblank.Steps) c
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6874-L7084)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L6887-L7097)
 
 ``` python
 Validate.add_steps(

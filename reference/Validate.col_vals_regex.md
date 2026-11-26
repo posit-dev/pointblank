@@ -4,7 +4,7 @@ Validate whether column values match a regular expression pattern.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11458-L11756)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L11471-L11769)
 
 ``` python
 Validate.col_vals_regex(

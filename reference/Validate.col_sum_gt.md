@@ -28,7 +28,7 @@ Null values are left out of the computation. The column must be numeric, and a n
 ## Parameters
 
 `columns: _PBUnresolvedColumn`  
-A single column or a list of columns to validate. If multiple columns are supplied, there will be a separate validation step generated for each column. The columns must contain numeric data for the sum to be computed.
+A single column or a list of columns to validate. Can also use [`col()`](../reference/col.md#pointblank.col) or a column selector (e.g., [`starts_with()`](../reference/starts_with.md#pointblank.starts_with)) to specify one or more columns. If multiple columns are supplied or resolved, there will be a separate validation step generated for each column. The columns must contain numeric data for the sum to be computed.
 
 `value: float | Column | ReferenceColumn | None = None`  
 The target to compare the column sum against. This can be: (1) a number, (2) a [`col()`](../reference/col.md#pointblank.col) object naming another column, in which case the target is the sum of that column in the same table, (3) a [`ref()`](../reference/ref.md#pointblank.ref) object naming a column in the reference data (set with `Validate(reference=)`), in which case the target is the sum of that column there, or (4) `None` (the default), which is shorthand for [ref()](../reference/ref.md#pointblank.ref) of the same column. Using `None` without reference data raises a `ValueError`. [col()](../reference/col.md#pointblank.col) takes a single column name here, not a column selector.

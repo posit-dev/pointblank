@@ -4,7 +4,7 @@ Validate that the percentage of *structured* missing values stays within a limit
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13056-L13267)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L13069-L13280)
 
 ``` python
 Validate.col_pct_missing(

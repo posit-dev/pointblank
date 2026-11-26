@@ -313,7 +313,7 @@ If the file is empty, if it has no contract <code>name</code>, or if a field has
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s write the contract file shown above to a temporary directory, then load it.</p>
-<div id="b0a15b45" class="cell" data-execution_count="2">
+<div id="a79fbbd9" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
@@ -348,7 +348,7 @@ If the file is empty, if it has no contract <code>name</code>, or if a field has
 </div>
 </div>
 <p>The loaded contract works like one defined in Python. Here it is applied to a small payments table:</p>
-<div id="78d44dc1" class="cell" data-execution_count="3">
+<div id="825fda1e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>payments <span class="op">=</span> pl.DataFrame({<span class="st">"payment_id"</span>: [<span class="st">"T1"</span>, <span class="st">"T2"</span>, <span class="st">"T3"</span>], <span class="st">"amount"</span>: [<span class="fl">50.0</span>, <span class="fl">0.0</span>, <span class="fl">12.5</span>]})</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>payments_contract.validate(payments)</span></code></pre></div>

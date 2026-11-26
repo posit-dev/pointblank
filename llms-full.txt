@@ -19466,9 +19466,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the sum to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the sum to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -19736,9 +19738,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the sum to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the sum to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -20006,9 +20010,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the sum to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the sum to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -20276,9 +20282,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the sum to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the sum to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -20546,9 +20554,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the sum to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the sum to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -20816,9 +20826,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the average to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the average to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -21086,9 +21098,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the average to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the average to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -21356,9 +21370,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the average to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the average to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -21626,9 +21642,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the average to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the average to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -21896,9 +21914,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the average to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the average to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -22166,9 +22186,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the standard deviation to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the standard deviation to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -22436,9 +22458,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the standard deviation to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the standard deviation to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -22706,9 +22730,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the standard deviation to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the standard deviation to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -22976,9 +23002,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the standard deviation to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the standard deviation to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -23246,9 +23274,11 @@ subset.
 ::: {.doc-definition-items}
 <code>[columns]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [\_PBUnresolvedColumn]{.doc-parameter-annotation}</code>
 
-:   A single column or a list of columns to validate. If multiple columns are supplied,
-    there will be a separate validation step generated for each column. The columns must
-    contain numeric data for the standard deviation to be computed.
+:   A single column or a list of columns to validate. Can also use
+    [`col()`](`pointblank.col`) or a column selector (e.g.,
+    [`starts_with()`](`pointblank.starts_with`)) to specify one or more columns. If multiple
+    columns are supplied or resolved, there will be a separate validation step generated for
+    each column. The columns must contain numeric data for the standard deviation to be computed.
 
 <code>[value]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [float | Column | ReferenceColumn | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
