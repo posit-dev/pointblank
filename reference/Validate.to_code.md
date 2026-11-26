@@ -4,7 +4,7 @@ Render this validation plan as canonical Pointblank Python code.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22773-L22938)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L22780-L22945)
 
 ``` python
 Validate.to_code()
@@ -92,7 +92,7 @@ print(validation_pre.to_code())
 
     validation
 
-    /tmp/ipykernel_24949/975139424.py:5: UserWarning: Some parts of the validation plan could not be fully serialized to code:
+    /tmp/ipykernel_24711/975139424.py:5: UserWarning: Some parts of the validation plan could not be fully serialized to code:
     - Step 'col_vals_gt' has a `pre=` preprocessing callable that cannot be serialized; it was dropped from the generated plan.
       print(validation_pre.to_code())
 

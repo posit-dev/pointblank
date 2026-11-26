@@ -278,7 +278,7 @@ The different values of <code>USUBJID</code> in the dataset, leaving out nulls. 
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s make a package where the AE dataset has two records for one subject:</p>
-<div id="10547fbb" class="cell" data-execution_count="1">
+<div id="2bcfb66b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -293,7 +293,7 @@ The different values of <code>USUBJID</code> in the dataset, leaving out nulls. 
 </div>
 </div>
 <p>Each subject appears once in the set, however many records they have. Sets can be compared directly, so here’s a check that every subject with an adverse event is in DM:</p>
-<div id="bf855340" class="cell" data-execution_count="2">
+<div id="ccf4d7c1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>study.subject_ids(<span class="st">"AE"</span>) <span class="op">&lt;=</span> study.subject_ids()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <pre><code>True</code></pre>

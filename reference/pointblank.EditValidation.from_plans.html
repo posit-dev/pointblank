@@ -290,7 +290,7 @@ An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="g
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Two versions of a plan can be compared directly, here as <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> objects:</p>
-<div id="204851c4" class="cell" data-execution_count="1">
+<div id="f6851c3b" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>)</span>
@@ -309,7 +309,7 @@ An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="g
 </div>
 </div>
 <p>The only change is the <code>value=</code> of the <a href="../reference/Validate.col_vals_gt.html#pointblank.Validate.col_vals_gt" class="gdls-link gdls-code">col_vals_gt()</a> step, reported as a single modification. The plans can also be YAML configurations, which are converted to Python code before they’re compared:</p>
-<div id="97856b43" class="cell" data-execution_count="2">
+<div id="32dcd813" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>v1_yaml <span class="op">=</span> <span class="st">'''</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="st">tbl: small_table</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">steps:</span></span>
