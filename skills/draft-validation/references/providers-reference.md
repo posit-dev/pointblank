@@ -26,6 +26,10 @@ model="openai:gpt-5.6-sol"
 
 Environment variable: `OPENAI_API_KEY`
 
+For an OpenAI-compatible server or gateway (vLLM, LiteLLM, etc.), also
+set `OPENAI_BASE_URL` to its URL; the requests then go to its Chat
+Completions endpoint.
+
 ### Ollama (local)
 
 ```python
@@ -75,6 +79,19 @@ model="cohere:command-a-03-2025"
 Environment variable: `CO_API_KEY` (or `COHERE_API_KEY`). Requests go
 to Cohere's OpenAI-compatible API, so this uses the OpenAI SDK.
 
+### Databricks
+
+```python
+model="databricks:databricks-claude-sonnet-4-6"   # the serving endpoint name
+```
+
+Needs `pip install databricks-sdk` (it isn't in the `generate` extra)
+and chatlas 0.13.2 or later. The SDK signs in with `DATABRICKS_HOST`
+and `DATABRICKS_TOKEN`, a profile in `~/.databrickscfg`, or a Databricks
+notebook's own credentials; `api_key=` is used as a personal access
+token. `verify_ssl=False` raises a `ValueError` (set `SSL_CERT_FILE` to
+trust a custom certificate authority instead).
+
 ## API key options
 
 ### Environment variables (recommended)
@@ -116,6 +133,7 @@ draft = pb.DraftValidation(
 | Bedrock            | yes | yes | yes |
 | Azure OpenAI       | yes | yes | yes |
 | Cohere             | yes | yes | yes |
+| Databricks         | yes | yes | yes |
 | `api_key` param    | yes | yes | yes |
 | `verify_ssl` param | yes | yes | no  |
 | `max_reprompts`    | yes | yes | no  |

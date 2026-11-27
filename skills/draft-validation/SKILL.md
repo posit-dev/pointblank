@@ -6,7 +6,7 @@ description: >
   modifying existing plans with natural language (and reviewing the
   change before accepting it), and the interactive assistant() chat
   interface. Supports Anthropic, OpenAI, Ollama, Bedrock, Azure OpenAI,
-  and Cohere providers. Use when bootstrapping validation for a new
+  Cohere, and Databricks providers. Use when bootstrapping validation for a new
   dataset or refining existing plans.
 license: MIT
 compatibility: Requires Python >=3.10, pointblank installed, plus an LLM provider SDK.
@@ -260,6 +260,9 @@ model="azure-openai:my-deployment-name"
 
 # Cohere
 model="cohere:command-a-03-2025"
+
+# Databricks (the part after the colon is the serving endpoint name)
+model="databricks:databricks-claude-sonnet-4-6"
 ```
 
 ### API key handling
@@ -274,6 +277,7 @@ By default, the API key is read from environment variables:
 | Bedrock      | AWS credentials                                                |
 | Azure OpenAI | `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT`, `OPENAI_API_VERSION` |
 | Cohere       | `CO_API_KEY` (or `COHERE_API_KEY`)                             |
+| Databricks   | `DATABRICKS_HOST`, `DATABRICKS_TOKEN` (or a `~/.databrickscfg` profile) |
 
 Or pass explicitly:
 
