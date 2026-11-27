@@ -375,6 +375,31 @@ validation = (
 validation.get_step_report(i=1)
 ```
 
+### Data Type Names Across Backends
+
+Data type names depend on the kind of table. A Polars DataFrame has Polars names (`"String"`,
+`"Int64"`, `"List(String)"`), while an Ibis table has Ibis names (`"string"`, `"int64"`,
+`"array<string>"`) whichever backend holds it. So a schema written for an Ibis table on DuckDB
+while developing locally also works for the same table on PySpark in production. A few Ibis
+types still differ between backends, such as a timestamp's precision (`"timestamp(6)"` on DuckDB
+but `"timestamp"` on PySpark), and `full_match_dtypes=False` lets a `"timestamp"` dtype match
+either one. To accept several names for a column, give the column a list of dtypes:
+
+```{python}
+# Accept the Polars name or the Ibis name for each column
+mixed_names_schema = pb.Schema(
+    columns={"id": ["Int64", "int64"], "name": ["String", "string"], "age": ["Int64", "int64"]}
+)
+
+validation = (
+    pb.Validate(data=users_table)
+    .col_schema_match(schema=mixed_names_schema)
+    .interrogate()
+)
+
+validation.get_step_report(i=1)
+```
+
 ## Common Schema Validation Patterns
 
 This section explores common patterns for applying schema validation to different scenarios. Each

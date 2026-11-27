@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Literal, cast
 
 import narwhals as nw
 
-from pointblank._constants import IBIS_BACKENDS
 from pointblank._utils import _get_tbl_type, _is_lazy_frame, _is_lib_present, _is_narwhals_table
 
 if TYPE_CHECKING:
@@ -82,6 +81,15 @@ class Schema:
     `ibis.expr.types.relations.Table`). Furthermore, using `Schema(tbl=)` with these types of tables
     requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a Polars or
     Pandas DataFrame, the availability of Ibis is not needed.
+
+    An Ibis table's dtypes have Ibis's names (e.g., `"string"`, `"int64"`, `"array<string>"`)
+    whichever backend holds the table, so a schema for an Ibis table on one backend (e.g., DuckDB)
+    also works with the same table on another (e.g., PySpark). Polars, Pandas and PySpark
+    DataFrames have their own dtype names (e.g., `"String"`, `"Int64"`, `"List(String)"`). Ibis
+    still gives a few dtypes differently on different backends, such as a timestamp column's
+    precision (`"timestamp(6)"` on DuckDB but `"timestamp"` on PySpark); with
+    `full_match_dtypes=False` in [`col_schema_match()`](`pointblank.Validate.col_schema_match`), a
+    dtype of `"timestamp"` matches both.
 
     Additional Notes on Schema Construction
     ---------------------------------------
@@ -412,8 +420,16 @@ class Schema:
         # Determine if this table can be converted to a Narwhals DataFrame
         table_type = _get_tbl_type(self.tbl)
 
-        # Collect column names and dtypes from the DataFrame and store as a list of tuples
-        if _is_narwhals_table(self.tbl):
+        # Collect column names and dtypes from the DataFrame and store as a list of tuples; an Ibis
+        # table gets Ibis's dtype names on every backend (including PySpark and Polars, which
+        # would otherwise take the branches for their own DataFrames), so the same schema works
+        # whichever backend holds the table
+        if "ibis.expr.types.relations.Table" in str(type(self.tbl)):
+            schema_dict = dict(cast("Any", self.tbl).schema().items())
+            schema_dict = {k: str(v) for k, v in schema_dict.items()}
+            self.columns = list(schema_dict.items())
+
+        elif _is_narwhals_table(self.tbl):
             if _is_lazy_frame(data=self.tbl):
                 schema_dict = dict(cast("Any", self.tbl).collect_schema())
             else:
@@ -444,11 +460,6 @@ class Schema:
                 schema_dict = dict(nw_df.schema.items())  # pragma: no cover
             schema_dict = {k: str(v) for k, v in schema_dict.items()}  # pragma: no cover
             self.columns = list(schema_dict.items())  # pragma: no cover
-
-        elif table_type in IBIS_BACKENDS:
-            schema_dict = dict(cast("Any", self.tbl).schema().items())
-            schema_dict = {k: str(v) for k, v in schema_dict.items()}
-            self.columns = list(schema_dict.items())
 
         else:
             raise ValueError(  # pragma: no cover

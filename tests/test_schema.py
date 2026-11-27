@@ -1,3 +1,4 @@
+import os
 import pathlib
 import sys
 
@@ -607,3 +608,70 @@ def test_col_schema_match_with_dtype_object_mismatch():
     tbl = pl.DataFrame({"a": [1.0], "b": ["x"]})
     schema = Schema(a=pl.Int64, b=pl.String)
     assert not Validate(tbl).col_schema_match(schema).interrogate().all_passed()
+
+
+# The dtypes that Ibis gives this table on every backend
+IBIS_TBL = pl.DataFrame(
+    {
+        "name": ["a", "b"],
+        "tags": [["x"], ["y", "z"]],
+        "n": [1, 2],
+        "x": [1.5, 2.5],
+        "flag": [True, False],
+    }
+)
+IBIS_DTYPES = [
+    ("name", "string"),
+    ("tags", "array<string>"),
+    ("n", "int64"),
+    ("x", "float64"),
+    ("flag", "boolean"),
+]
+
+
+def _spark_tbl(tbl: pl.DataFrame):
+    if os.environ.get("SKIP_PYSPARK_TESTS", "").lower() in ("true", "1", "yes"):
+        pytest.skip("PySpark tests disabled via SKIP_PYSPARK_TESTS environment variable")
+    pytest.importorskip("pyspark")
+    from pyspark.sql import SparkSession
+
+    try:
+        spark = (
+            SparkSession.builder.appName("PointblankSchemaTests")
+            .master("local[1]")
+            .config("spark.ui.enabled", "false")
+            .config("spark.sql.shuffle.partitions", "2")
+            .getOrCreate()
+        )
+    except Exception:  # pragma: no cover
+        pytest.skip("PySpark can't start")
+    return spark.createDataFrame(
+        tbl.rows(), schema="name string, tags array<string>, n long, x double, flag boolean"
+    )
+
+
+@pytest.mark.parametrize("backend", ["duckdb", "memtable", "polars"])
+def test_schema_from_ibis_table_uses_ibis_dtypes(backend):
+    # Ibis's Polars backend used to take the branch for Polars DataFrames and fail
+    if backend == "memtable":
+        tbl = ibis.memtable(IBIS_TBL)
+    else:
+        tbl = getattr(ibis, backend).connect().create_table("tbl", IBIS_TBL)
+
+    assert Schema(tbl=tbl).columns == IBIS_DTYPES
+    assert Validate(tbl).col_schema_match(Schema(columns=IBIS_DTYPES)).interrogate().all_passed()
+
+
+def test_schema_from_ibis_pyspark_table_uses_ibis_dtypes():
+    # An Ibis table on PySpark used to get the Narwhals dtypes of a PySpark DataFrame (`String`,
+    # `List(String)`), so a schema from an Ibis table on another backend didn't match it
+    spark_df = _spark_tbl(IBIS_TBL)
+    spark_df.createOrReplaceTempView("ibis_schema_tbl")
+    tbl = ibis.pyspark.connect(spark_df.sparkSession).table("ibis_schema_tbl")
+
+    assert Schema(tbl=tbl).columns == IBIS_DTYPES
+    duckdb_schema = Schema(tbl=ibis.duckdb.connect().create_table("tbl", IBIS_TBL))
+    assert Validate(tbl).col_schema_match(duckdb_schema).interrogate().all_passed()
+
+    # A PySpark DataFrame keeps its Narwhals dtypes
+    assert Schema(tbl=spark_df).columns[:2] == [("name", "String"), ("tags", "List(String)")]
