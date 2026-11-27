@@ -4,7 +4,7 @@ Execute the revised plan and return the resulting [Validate](../reference/Valida
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L697-L795)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L700-L798)
 
 ``` python
 accept(data=None)

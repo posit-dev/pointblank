@@ -4,7 +4,7 @@ Draft a validation plan for a given table using an LLM.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L25-L491)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L25-L507)
 
 ``` python
 DraftValidation(
@@ -17,7 +17,7 @@ DraftValidation(
 )
 ```
 
-By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation) class uses the `chatlas` package to draft a validation plan for a given table using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`, or `"cohere"` provider. You can install all requirements for the class through an optional 'generate' install of Pointblank via `pip install pointblank[generate]`.
+By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The [DraftValidation](../reference/DraftValidation.md#pointblank.DraftValidation) class uses the `chatlas` package to draft a validation plan for a given table using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`, `"cohere"`, or `"databricks"` provider. You can install all requirements for the class through an optional 'generate' install of Pointblank via `pip install pointblank[generate]` (the `"databricks"` provider also needs the `databricks-sdk` package).
 
 > **Warning**
 >
@@ -29,13 +29,13 @@ By using a large language model (LLM) to draft a validation plan, you can quickl
 The data to be used for drafting a validation plan.
 
 `model: str`  
-The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`. For `"azure-openai"`, the value after the colon is the Azure *deployment id*, not an OpenAI model id.
+The model to be used. This should be in the form of `provider:model` (e.g., `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`, `"cohere"`, and `"databricks"`. For `"azure-openai"`, the value after the colon is the Azure *deployment id*, not an OpenAI model id, and for `"databricks"` it's the name of a serving endpoint.
 
 `api_key: str | None = None`  
 The API key to be used for the model.
 
 `verify_ssl: bool = True`  
-Whether to verify SSL certificates when making requests to the LLM provider. Set to `False` to disable SSL verification (e.g., when behind a corporate firewall with self-signed certificates). Defaults to `True`. Use with caution as disabling SSL verification can pose security risks.
+Whether to verify SSL certificates when making requests to the LLM provider. Set to `False` to disable SSL verification (e.g., when behind a corporate firewall with self-signed certificates). Defaults to `True`. Use with caution as disabling SSL verification can pose security risks. This isn't supported for the `"databricks"` provider.
 
 `max_reprompts: int = 1`  
 The maximum number of times to ask the model for a corrected plan when the one it returned doesn't pass a basic check: the code must parse as Python, and every method that looks like a validation method (a name starting with `col_`, `row_`, or `rows_`) must exist, since models sometimes invent method names. The retry tells the model what the problem was. Each retry is another request to the provider, so a higher value can cost more. Set to `0` to accept the first reply as is, and check it yourself with the object's [validate_syntax()](../reference/pointblank.EditValidation.validate_syntax.md) method. Defaults to `1`.
@@ -58,8 +58,13 @@ The `model=` argument should be constructed using the provider and model name se
 - `"bedrock"` (Amazon Bedrock)
 - `"azure-openai"` (Azure OpenAI)
 - `"cohere"` (Cohere)
+- `"databricks"` (Databricks)
 
 The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider's documentation for the most up-to-date model names. For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the name you assigned when deploying the model in your Azure OpenAI resource). It also requires the environment variables `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) to be set. For `"cohere"`, the API key is read from `CO_API_KEY` (or `COHERE_API_KEY`) if `api_key=` isn't given, and the requests go to Cohere's OpenAI-compatible API.
+
+For `"databricks"`, the value after the colon is the name of a Model Serving endpoint in your workspace (e.g., `"databricks:databricks-claude-sonnet-4-6"`). It needs the `databricks-sdk` package (`pip install databricks-sdk`) and chatlas 0.13.2 or later. The `databricks-sdk` package handles signing in: through the `DATABRICKS_HOST` and `DATABRICKS_TOKEN` environment variables, a profile in `~/.databrickscfg`, or a Databricks notebook's own credentials. If `api_key=` is given, it's used as a personal access token.
+
+For `"openai"`, if the `OPENAI_BASE_URL` environment variable is set, the requests go to the Chat Completions endpoint at that URL instead of to OpenAI. This is a way to use an OpenAI-compatible server or gateway (such as vLLM or LiteLLM), with `OPENAI_API_KEY` (or `api_key=`) as its key.
 
 ## Notes On Authentication
 

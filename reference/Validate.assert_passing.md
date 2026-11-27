@@ -4,7 +4,7 @@ Raise an `AssertionError` if all tests are not passing.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21294-L21371)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L21302-L21379)
 
 ``` python
 Validate.assert_passing()
@@ -55,12 +55,12 @@ validation.assert_passing()
          19 # No need to call `interrogate()` explicitly
     ---> 20 validation.assert_passing()
 
-    File ~/work/pointblank/pointblank/pointblank/validate.py:21371, in Validate.assert_passing(self)
-      21367                     reason = f": {note['text']}" if note else ""
-      21368                     line += f" (couldn't be evaluated{reason})"
-      21369                 failed_steps.append(line)
-      21370             msg = "The following assertions failed:\n" + "\n".join(failed_steps)
-    > 21371             raise AssertionError(msg)
+    File ~/work/pointblank/pointblank/pointblank/validate.py:21379, in Validate.assert_passing(self)
+      21375                     reason = f": {note['text']}" if note else ""
+      21376                     line += f" (couldn't be evaluated{reason})"
+      21377                 failed_steps.append(line)
+      21378             msg = "The following assertions failed:\n" + "\n".join(failed_steps)
+    > 21379             raise AssertionError(msg)
 
     AssertionError: The following assertions failed:
     - Step 2: Expect that values in `b` should be < `9`.

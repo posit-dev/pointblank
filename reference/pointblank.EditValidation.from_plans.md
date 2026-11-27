@@ -4,7 +4,7 @@ Build an [EditValidation](../reference/EditValidation.md#pointblank.EditValidati
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L348-L445)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L351-L448)
 
 ``` python
 from_plans(

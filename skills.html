@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-d115e8fe119fec3d8a9be5efe5eb78bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-16c2c2c5529e599bbe6a41763d9257cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -261,7 +261,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <button class="gd-skill-pill gd-skill-pill--active" role="tab" aria-selected="true" tabindex="0" title="Validate DataFrames and database tables with Pointblank. Covers the Validate workflow (plan, interrogate, report), column selectors, data backends (Polars, Pandas, PySpark, DuckDB, databases via Ibis), threshold levels, actions, and result extraction (including per-row failure flags). Use when building, running, or troubleshooting data-validation pipelines.">pointblank</button>
   <button class="gd-skill-pill" role="tab" aria-selected="false" tabindex="-1" title="Write data-validation plans with Pointblank. Covers choosing the right validation methods for each data quality concern, composing multi-step plans, setting thresholds and actions, using segments, conditional steps, handling nulls and missing values, and extracting results. Use when building or improving a validation workflow.">write-validation</button>
   <button class="gd-skill-pill" role="tab" aria-selected="false" tabindex="-1" title="Define Pointblank validation plans in YAML instead of Python code. Covers the YAML schema, validate_yaml() for checking a config, yaml_interrogate() for execution, yaml_to_python() for code generation, Validate.to_yaml() for export, Python code in YAML (allow_python), data source configuration, and the ablation block run by yaml_ablation(). Use when defining validation plans declaratively or sharing them across teams.">validate-yaml</button>
-  <button class="gd-skill-pill" role="tab" aria-selected="false" tabindex="-1" title="Use LLMs to draft and edit Pointblank validation plans. Covers DraftValidation for generating plans from data, EditValidation for modifying existing plans with natural language (and reviewing the change before accepting it), and the interactive assistant() chat interface. Supports Anthropic, OpenAI, Ollama, Bedrock, Azure OpenAI, and Cohere providers. Use when bootstrapping validation for a new dataset or refining existing plans.">draft-validation</button>
+  <button class="gd-skill-pill" role="tab" aria-selected="false" tabindex="-1" title="Use LLMs to draft and edit Pointblank validation plans. Covers DraftValidation for generating plans from data, EditValidation for modifying existing plans with natural language (and reviewing the change before accepting it), and the interactive assistant() chat interface. Supports Anthropic, OpenAI, Ollama, Bedrock, Azure OpenAI, Cohere, and Databricks providers. Use when bootstrapping validation for a new dataset or refining existing plans.">draft-validation</button>
   <button class="gd-skill-pill" role="tab" aria-selected="false" tabindex="-1" title="Define data contracts and pipeline validation with Pointblank. Covers Contract, Step, Schema, Pipeline, and PipelineResult for enforcing structural and semantic expectations at data boundaries, plus YAML serialization and import/export of external contract formats (JSON Schema, Frictionless, dbt, ODCS). Use when setting up source/target contracts, pipeline validation, or contract files.">define-contracts</button>
   <button class="gd-skill-pill" role="tab" aria-selected="false" tabindex="-1" title="Profile and scan datasets with Pointblank before writing validation rules. Covers DataScan for column-level statistics, comparing a scan with a saved baseline to find drift (DataScan.compare), schemas taken from a table, missing values analysis with missing_vals_tbl(), and table previewing. Use when exploring a new dataset, understanding data distributions before validation, or checking a refreshed table against an earlier profile.">scan-and-profile</button>
   <button class="gd-skill-pill" role="tab" aria-selected="false" tabindex="-1" title="Generate synthetic datasets with Pointblank using Schema and field classes. Covers IntField, FloatField, StringField, BoolField, DateField, DatetimeField, and more. Supports presets (name, email, address, etc.), country-specific data, nullable columns, unique constraints, profile_fields() for person data, schemas inferred from a real table, and check_synthetic() for comparing synthetic data with the real data it imitates. Use when creating test data, fixtures, or synthetic datasets for validation testing.">generate-data</button>
@@ -2537,7 +2537,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">  modifying existing plans with natural language (and reviewing the</span></span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">  change before accepting it), and the interactive assistant() chat</span></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">  interface. Supports Anthropic, OpenAI, Ollama, Bedrock, Azure OpenAI,</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">  and Cohere providers. Use when bootstrapping validation for a new</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">  Cohere, and Databricks providers. Use when bootstrapping validation for a new</span></span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">  dataset or refining existing plans.</span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="an">license:</span><span class="co"> MIT</span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="an">compatibility:</span><span class="co"> Requires Python &gt;=3.10, pointblank installed, plus an LLM provider SDK.</span></span>
@@ -2791,95 +2791,99 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-260"><a href="#cb10-260" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-261"><a href="#cb10-261" aria-hidden="true" tabindex="-1"></a><span class="co"># Cohere</span></span>
 <span id="cb10-262"><a href="#cb10-262" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"cohere:command-a-03-2025"</span></span>
-<span id="cb10-263"><a href="#cb10-263" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-264"><a href="#cb10-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-265"><a href="#cb10-265" aria-hidden="true" tabindex="-1"></a><span class="fu">### API key handling</span></span>
-<span id="cb10-266"><a href="#cb10-266" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-267"><a href="#cb10-267" aria-hidden="true" tabindex="-1"></a>By default, the API key is read from environment variables:</span>
-<span id="cb10-268"><a href="#cb10-268" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-269"><a href="#cb10-269" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Provider     <span class="pp">|</span> Environment variable                                           <span class="pp">|</span></span>
-<span id="cb10-270"><a href="#cb10-270" aria-hidden="true" tabindex="-1"></a><span class="pp">| ------------</span> <span class="pp">| --------------------------------------------------------------</span> <span class="pp">|</span></span>
-<span id="cb10-271"><a href="#cb10-271" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Anthropic    <span class="pp">|</span> <span class="in">`ANTHROPIC_API_KEY`</span>                                            <span class="pp">|</span></span>
-<span id="cb10-272"><a href="#cb10-272" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> OpenAI       <span class="pp">|</span> <span class="in">`OPENAI_API_KEY`</span>                                               <span class="pp">|</span></span>
-<span id="cb10-273"><a href="#cb10-273" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Ollama       <span class="pp">|</span> (no key needed)                                                <span class="pp">|</span></span>
-<span id="cb10-274"><a href="#cb10-274" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Bedrock      <span class="pp">|</span> AWS credentials                                                <span class="pp">|</span></span>
-<span id="cb10-275"><a href="#cb10-275" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Azure OpenAI <span class="pp">|</span> <span class="in">`AZURE_OPENAI_API_KEY`</span>, <span class="in">`AZURE_OPENAI_ENDPOINT`</span>, <span class="in">`OPENAI_API_VERSION`</span> <span class="pp">|</span></span>
-<span id="cb10-276"><a href="#cb10-276" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cohere       <span class="pp">|</span> <span class="in">`CO_API_KEY`</span> (or <span class="in">`COHERE_API_KEY`</span>)                             <span class="pp">|</span></span>
-<span id="cb10-277"><a href="#cb10-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-278"><a href="#cb10-278" aria-hidden="true" tabindex="-1"></a>Or pass explicitly:</span>
-<span id="cb10-279"><a href="#cb10-279" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-280"><a href="#cb10-280" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb10-281"><a href="#cb10-281" aria-hidden="true" tabindex="-1"></a>draft <span class="op">=</span> pb.DraftValidation(</span>
-<span id="cb10-282"><a href="#cb10-282" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df,</span>
-<span id="cb10-283"><a href="#cb10-283" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-6"</span>,</span>
-<span id="cb10-284"><a href="#cb10-284" aria-hidden="true" tabindex="-1"></a>    api_key<span class="op">=</span><span class="st">"sk-..."</span>,</span>
-<span id="cb10-285"><a href="#cb10-285" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-286"><a href="#cb10-286" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-287"><a href="#cb10-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-288"><a href="#cb10-288" aria-hidden="true" tabindex="-1"></a><span class="fu">## Workflows</span></span>
-<span id="cb10-289"><a href="#cb10-289" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-290"><a href="#cb10-290" aria-hidden="true" tabindex="-1"></a><span class="fu">### Bootstrapping validation for a new dataset</span></span>
+<span id="cb10-263"><a href="#cb10-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-264"><a href="#cb10-264" aria-hidden="true" tabindex="-1"></a><span class="co"># Databricks (the part after the colon is the serving endpoint name)</span></span>
+<span id="cb10-265"><a href="#cb10-265" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"databricks:databricks-claude-sonnet-4-6"</span></span>
+<span id="cb10-266"><a href="#cb10-266" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-267"><a href="#cb10-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-268"><a href="#cb10-268" aria-hidden="true" tabindex="-1"></a><span class="fu">### API key handling</span></span>
+<span id="cb10-269"><a href="#cb10-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-270"><a href="#cb10-270" aria-hidden="true" tabindex="-1"></a>By default, the API key is read from environment variables:</span>
+<span id="cb10-271"><a href="#cb10-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-272"><a href="#cb10-272" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Provider     <span class="pp">|</span> Environment variable                                           <span class="pp">|</span></span>
+<span id="cb10-273"><a href="#cb10-273" aria-hidden="true" tabindex="-1"></a><span class="pp">| ------------</span> <span class="pp">| --------------------------------------------------------------</span> <span class="pp">|</span></span>
+<span id="cb10-274"><a href="#cb10-274" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Anthropic    <span class="pp">|</span> <span class="in">`ANTHROPIC_API_KEY`</span>                                            <span class="pp">|</span></span>
+<span id="cb10-275"><a href="#cb10-275" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> OpenAI       <span class="pp">|</span> <span class="in">`OPENAI_API_KEY`</span>                                               <span class="pp">|</span></span>
+<span id="cb10-276"><a href="#cb10-276" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Ollama       <span class="pp">|</span> (no key needed)                                                <span class="pp">|</span></span>
+<span id="cb10-277"><a href="#cb10-277" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Bedrock      <span class="pp">|</span> AWS credentials                                                <span class="pp">|</span></span>
+<span id="cb10-278"><a href="#cb10-278" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Azure OpenAI <span class="pp">|</span> <span class="in">`AZURE_OPENAI_API_KEY`</span>, <span class="in">`AZURE_OPENAI_ENDPOINT`</span>, <span class="in">`OPENAI_API_VERSION`</span> <span class="pp">|</span></span>
+<span id="cb10-279"><a href="#cb10-279" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cohere       <span class="pp">|</span> <span class="in">`CO_API_KEY`</span> (or <span class="in">`COHERE_API_KEY`</span>)                             <span class="pp">|</span></span>
+<span id="cb10-280"><a href="#cb10-280" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Databricks   <span class="pp">|</span> <span class="in">`DATABRICKS_HOST`</span>, <span class="in">`DATABRICKS_TOKEN`</span> (or a <span class="in">`~/.databrickscfg`</span> profile) <span class="pp">|</span></span>
+<span id="cb10-281"><a href="#cb10-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-282"><a href="#cb10-282" aria-hidden="true" tabindex="-1"></a>Or pass explicitly:</span>
+<span id="cb10-283"><a href="#cb10-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-284"><a href="#cb10-284" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb10-285"><a href="#cb10-285" aria-hidden="true" tabindex="-1"></a>draft <span class="op">=</span> pb.DraftValidation(</span>
+<span id="cb10-286"><a href="#cb10-286" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df,</span>
+<span id="cb10-287"><a href="#cb10-287" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-6"</span>,</span>
+<span id="cb10-288"><a href="#cb10-288" aria-hidden="true" tabindex="-1"></a>    api_key<span class="op">=</span><span class="st">"sk-..."</span>,</span>
+<span id="cb10-289"><a href="#cb10-289" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-290"><a href="#cb10-290" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb10-291"><a href="#cb10-291" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-292"><a href="#cb10-292" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Load your data.</span>
-<span id="cb10-293"><a href="#cb10-293" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Run <span class="in">`pb.DraftValidation(data=df, model="...")`</span>.</span>
-<span id="cb10-294"><a href="#cb10-294" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Review the generated code with <span class="in">`draft.code`</span>.</span>
-<span id="cb10-295"><a href="#cb10-295" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Check it with <span class="in">`draft.validate_syntax()`</span>.</span>
-<span id="cb10-296"><a href="#cb10-296" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Copy the code into your project, replace <span class="in">`your_data`</span>, and customize.</span>
-<span id="cb10-297"><a href="#cb10-297" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>Run <span class="in">`interrogate()`</span> and iterate.</span>
-<span id="cb10-298"><a href="#cb10-298" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-299"><a href="#cb10-299" aria-hidden="true" tabindex="-1"></a><span class="fu">### Iterating on a validation plan</span></span>
-<span id="cb10-300"><a href="#cb10-300" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-301"><a href="#cb10-301" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Start with a draft or existing validation.</span>
-<span id="cb10-302"><a href="#cb10-302" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Use <span class="in">`EditValidation`</span> with natural language instructions.</span>
-<span id="cb10-303"><a href="#cb10-303" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Review changes with <span class="in">`edit.review()`</span> or <span class="in">`edit.diff()`</span>.</span>
-<span id="cb10-304"><a href="#cb10-304" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Accept with <span class="in">`edit.accept()`</span> or iterate with another edit.</span>
-<span id="cb10-305"><a href="#cb10-305" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-306"><a href="#cb10-306" aria-hidden="true" tabindex="-1"></a><span class="fu">### Reviewing a change to a saved plan</span></span>
-<span id="cb10-307"><a href="#cb10-307" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-308"><a href="#cb10-308" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Load the old and new versions (files, YAML, or <span class="in">`Validate`</span> objects).</span>
-<span id="cb10-309"><a href="#cb10-309" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Run <span class="in">`pb.EditValidation.from_plans(old, new)`</span>.</span>
-<span id="cb10-310"><a href="#cb10-310" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Read <span class="in">`changed_steps()`</span> or <span class="in">`review()`</span>.</span>
+<span id="cb10-292"><a href="#cb10-292" aria-hidden="true" tabindex="-1"></a><span class="fu">## Workflows</span></span>
+<span id="cb10-293"><a href="#cb10-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-294"><a href="#cb10-294" aria-hidden="true" tabindex="-1"></a><span class="fu">### Bootstrapping validation for a new dataset</span></span>
+<span id="cb10-295"><a href="#cb10-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-296"><a href="#cb10-296" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Load your data.</span>
+<span id="cb10-297"><a href="#cb10-297" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Run <span class="in">`pb.DraftValidation(data=df, model="...")`</span>.</span>
+<span id="cb10-298"><a href="#cb10-298" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Review the generated code with <span class="in">`draft.code`</span>.</span>
+<span id="cb10-299"><a href="#cb10-299" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Check it with <span class="in">`draft.validate_syntax()`</span>.</span>
+<span id="cb10-300"><a href="#cb10-300" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Copy the code into your project, replace <span class="in">`your_data`</span>, and customize.</span>
+<span id="cb10-301"><a href="#cb10-301" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>Run <span class="in">`interrogate()`</span> and iterate.</span>
+<span id="cb10-302"><a href="#cb10-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-303"><a href="#cb10-303" aria-hidden="true" tabindex="-1"></a><span class="fu">### Iterating on a validation plan</span></span>
+<span id="cb10-304"><a href="#cb10-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-305"><a href="#cb10-305" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Start with a draft or existing validation.</span>
+<span id="cb10-306"><a href="#cb10-306" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Use <span class="in">`EditValidation`</span> with natural language instructions.</span>
+<span id="cb10-307"><a href="#cb10-307" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Review changes with <span class="in">`edit.review()`</span> or <span class="in">`edit.diff()`</span>.</span>
+<span id="cb10-308"><a href="#cb10-308" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Accept with <span class="in">`edit.accept()`</span> or iterate with another edit.</span>
+<span id="cb10-309"><a href="#cb10-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-310"><a href="#cb10-310" aria-hidden="true" tabindex="-1"></a><span class="fu">### Reviewing a change to a saved plan</span></span>
 <span id="cb10-311"><a href="#cb10-311" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-312"><a href="#cb10-312" aria-hidden="true" tabindex="-1"></a><span class="fu">### Interactive exploration</span></span>
-<span id="cb10-313"><a href="#cb10-313" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-314"><a href="#cb10-314" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Start <span class="in">`pb.assistant(model="...", data=df)`</span>.</span>
-<span id="cb10-315"><a href="#cb10-315" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Ask questions about your data and validation needs.</span>
-<span id="cb10-316"><a href="#cb10-316" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Copy suggested code into your project.</span>
+<span id="cb10-312"><a href="#cb10-312" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Load the old and new versions (files, YAML, or <span class="in">`Validate`</span> objects).</span>
+<span id="cb10-313"><a href="#cb10-313" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Run <span class="in">`pb.EditValidation.from_plans(old, new)`</span>.</span>
+<span id="cb10-314"><a href="#cb10-314" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Read <span class="in">`changed_steps()`</span> or <span class="in">`review()`</span>.</span>
+<span id="cb10-315"><a href="#cb10-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-316"><a href="#cb10-316" aria-hidden="true" tabindex="-1"></a><span class="fu">### Interactive exploration</span></span>
 <span id="cb10-317"><a href="#cb10-317" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-318"><a href="#cb10-318" aria-hidden="true" tabindex="-1"></a><span class="fu">## Gotchas</span></span>
-<span id="cb10-319"><a href="#cb10-319" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-320"><a href="#cb10-320" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**LLM output is not guaranteed correct.** Always review generated</span>
-<span id="cb10-321"><a href="#cb10-321" aria-hidden="true" tabindex="-1"></a>   code before using in production.</span>
-<span id="cb10-322"><a href="#cb10-322" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**<span class="in">`validate_syntax()`</span> checks that the code parses and that every</span>
-<span id="cb10-323"><a href="#cb10-323" aria-hidden="true" tabindex="-1"></a>   <span class="in">`col_*`</span>/<span class="in">`row_*`</span>/<span class="in">`rows_*`</span> method exists.** It doesn't run the code,</span>
-<span id="cb10-324"><a href="#cb10-324" aria-hidden="true" tabindex="-1"></a>   so a wrong argument name or value is only caught by <span class="in">`accept()`</span> or</span>
-<span id="cb10-325"><a href="#cb10-325" aria-hidden="true" tabindex="-1"></a>   at interrogation.</span>
-<span id="cb10-326"><a href="#cb10-326" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**`max_reprompts` controls retries.** When the plan fails that</span>
-<span id="cb10-327"><a href="#cb10-327" aria-hidden="true" tabindex="-1"></a>   check, the model is told the problem and asked again, up to this</span>
-<span id="cb10-328"><a href="#cb10-328" aria-hidden="true" tabindex="-1"></a>   many times. Each retry is another request; <span class="in">`0`</span> takes the first reply.</span>
-<span id="cb10-329"><a href="#cb10-329" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**`accept()` runs the revised code with `exec()`.** Read it with</span>
-<span id="cb10-330"><a href="#cb10-330" aria-hidden="true" tabindex="-1"></a>   <span class="in">`to_code()`</span> or <span class="in">`review()`</span> first, as you would any code you didn't</span>
-<span id="cb10-331"><a href="#cb10-331" aria-hidden="true" tabindex="-1"></a>   write.</span>
-<span id="cb10-332"><a href="#cb10-332" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**`accept()` returns an uninterrogated Validate object.** Call</span>
-<span id="cb10-333"><a href="#cb10-333" aria-hidden="true" tabindex="-1"></a>   <span class="in">`.interrogate()`</span> to execute. It needs a table, from <span class="in">`accept(data=)`</span></span>
-<span id="cb10-334"><a href="#cb10-334" aria-hidden="true" tabindex="-1"></a>   or the <span class="in">`EditValidation`</span>'s <span class="in">`data=`</span>.</span>
-<span id="cb10-335"><a href="#cb10-335" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Ollama runs locally.** No API key needed but the model must be</span>
-<span id="cb10-336"><a href="#cb10-336" aria-hidden="true" tabindex="-1"></a>   downloaded first with <span class="in">`ollama pull`</span>.</span>
-<span id="cb10-337"><a href="#cb10-337" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**The assistant requires a running display.** <span class="in">`"browser"`</span> opens a</span>
-<span id="cb10-338"><a href="#cb10-338" aria-hidden="true" tabindex="-1"></a>   web interface; <span class="in">`"terminal"`</span> uses the console. Neither works in</span>
-<span id="cb10-339"><a href="#cb10-339" aria-hidden="true" tabindex="-1"></a>   non-interactive environments.</span>
-<span id="cb10-340"><a href="#cb10-340" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**The model sees a summary, not the rows.** Bounds and sets it</span>
-<span id="cb10-341"><a href="#cb10-341" aria-hidden="true" tabindex="-1"></a>   suggests come from summary statistics and a few sample values, so</span>
-<span id="cb10-342"><a href="#cb10-342" aria-hidden="true" tabindex="-1"></a>   check them against the data.</span>
-<span id="cb10-343"><a href="#cb10-343" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-344"><a href="#cb10-344" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related skills</span></span>
-<span id="cb10-345"><a href="#cb10-345" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-346"><a href="#cb10-346" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Skill            <span class="pp">|</span> When to use it                              <span class="pp">|</span></span>
-<span id="cb10-347"><a href="#cb10-347" aria-hidden="true" tabindex="-1"></a><span class="pp">| ----------------</span> <span class="pp">| -------------------------------------------</span> <span class="pp">|</span></span>
-<span id="cb10-348"><a href="#cb10-348" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pointblank       <span class="pp">|</span> Full Validate workflow after drafting       <span class="pp">|</span></span>
-<span id="cb10-349"><a href="#cb10-349" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> write-validation <span class="pp">|</span> Manual validation plan composition          <span class="pp">|</span></span>
-<span id="cb10-350"><a href="#cb10-350" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> scan-and-profile <span class="pp">|</span> Profile data before asking the LLM to draft <span class="pp">|</span></span>
-<span id="cb10-351"><a href="#cb10-351" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> validate-yaml    <span class="pp">|</span> Keep the accepted plan as YAML              <span class="pp">|</span></span></code></pre></div>
+<span id="cb10-318"><a href="#cb10-318" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Start <span class="in">`pb.assistant(model="...", data=df)`</span>.</span>
+<span id="cb10-319"><a href="#cb10-319" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Ask questions about your data and validation needs.</span>
+<span id="cb10-320"><a href="#cb10-320" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Copy suggested code into your project.</span>
+<span id="cb10-321"><a href="#cb10-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-322"><a href="#cb10-322" aria-hidden="true" tabindex="-1"></a><span class="fu">## Gotchas</span></span>
+<span id="cb10-323"><a href="#cb10-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-324"><a href="#cb10-324" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**LLM output is not guaranteed correct.** Always review generated</span>
+<span id="cb10-325"><a href="#cb10-325" aria-hidden="true" tabindex="-1"></a>   code before using in production.</span>
+<span id="cb10-326"><a href="#cb10-326" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**<span class="in">`validate_syntax()`</span> checks that the code parses and that every</span>
+<span id="cb10-327"><a href="#cb10-327" aria-hidden="true" tabindex="-1"></a>   <span class="in">`col_*`</span>/<span class="in">`row_*`</span>/<span class="in">`rows_*`</span> method exists.** It doesn't run the code,</span>
+<span id="cb10-328"><a href="#cb10-328" aria-hidden="true" tabindex="-1"></a>   so a wrong argument name or value is only caught by <span class="in">`accept()`</span> or</span>
+<span id="cb10-329"><a href="#cb10-329" aria-hidden="true" tabindex="-1"></a>   at interrogation.</span>
+<span id="cb10-330"><a href="#cb10-330" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**`max_reprompts` controls retries.** When the plan fails that</span>
+<span id="cb10-331"><a href="#cb10-331" aria-hidden="true" tabindex="-1"></a>   check, the model is told the problem and asked again, up to this</span>
+<span id="cb10-332"><a href="#cb10-332" aria-hidden="true" tabindex="-1"></a>   many times. Each retry is another request; <span class="in">`0`</span> takes the first reply.</span>
+<span id="cb10-333"><a href="#cb10-333" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**`accept()` runs the revised code with `exec()`.** Read it with</span>
+<span id="cb10-334"><a href="#cb10-334" aria-hidden="true" tabindex="-1"></a>   <span class="in">`to_code()`</span> or <span class="in">`review()`</span> first, as you would any code you didn't</span>
+<span id="cb10-335"><a href="#cb10-335" aria-hidden="true" tabindex="-1"></a>   write.</span>
+<span id="cb10-336"><a href="#cb10-336" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**`accept()` returns an uninterrogated Validate object.** Call</span>
+<span id="cb10-337"><a href="#cb10-337" aria-hidden="true" tabindex="-1"></a>   <span class="in">`.interrogate()`</span> to execute. It needs a table, from <span class="in">`accept(data=)`</span></span>
+<span id="cb10-338"><a href="#cb10-338" aria-hidden="true" tabindex="-1"></a>   or the <span class="in">`EditValidation`</span>'s <span class="in">`data=`</span>.</span>
+<span id="cb10-339"><a href="#cb10-339" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Ollama runs locally.** No API key needed but the model must be</span>
+<span id="cb10-340"><a href="#cb10-340" aria-hidden="true" tabindex="-1"></a>   downloaded first with <span class="in">`ollama pull`</span>.</span>
+<span id="cb10-341"><a href="#cb10-341" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**The assistant requires a running display.** <span class="in">`"browser"`</span> opens a</span>
+<span id="cb10-342"><a href="#cb10-342" aria-hidden="true" tabindex="-1"></a>   web interface; <span class="in">`"terminal"`</span> uses the console. Neither works in</span>
+<span id="cb10-343"><a href="#cb10-343" aria-hidden="true" tabindex="-1"></a>   non-interactive environments.</span>
+<span id="cb10-344"><a href="#cb10-344" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**The model sees a summary, not the rows.** Bounds and sets it</span>
+<span id="cb10-345"><a href="#cb10-345" aria-hidden="true" tabindex="-1"></a>   suggests come from summary statistics and a few sample values, so</span>
+<span id="cb10-346"><a href="#cb10-346" aria-hidden="true" tabindex="-1"></a>   check them against the data.</span>
+<span id="cb10-347"><a href="#cb10-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-348"><a href="#cb10-348" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related skills</span></span>
+<span id="cb10-349"><a href="#cb10-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-350"><a href="#cb10-350" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Skill            <span class="pp">|</span> When to use it                              <span class="pp">|</span></span>
+<span id="cb10-351"><a href="#cb10-351" aria-hidden="true" tabindex="-1"></a><span class="pp">| ----------------</span> <span class="pp">| -------------------------------------------</span> <span class="pp">|</span></span>
+<span id="cb10-352"><a href="#cb10-352" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pointblank       <span class="pp">|</span> Full Validate workflow after drafting       <span class="pp">|</span></span>
+<span id="cb10-353"><a href="#cb10-353" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> write-validation <span class="pp">|</span> Manual validation plan composition          <span class="pp">|</span></span>
+<span id="cb10-354"><a href="#cb10-354" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> scan-and-profile <span class="pp">|</span> Profile data before asking the LLM to draft <span class="pp">|</span></span>
+<span id="cb10-355"><a href="#cb10-355" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> validate-yaml    <span class="pp">|</span> Keep the accepted plan as YAML              <span class="pp">|</span></span></code></pre></div>
 </pre>
 <h3 id="draft-validation-references-providers-reference-md" class="gd-skills-file-heading anchored">references/providers-reference.md</h3>
 <pre class="gd-skills-raw"><div class="sourceCode" id="cb11"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># LLM providers reference</span></span>
@@ -2910,105 +2914,123 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>Environment variable: <span class="in">`OPENAI_API_KEY`</span></span>
 <span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="fu">### Ollama (local)</span></span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"ollama:llama3"</span></span>
-<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"ollama:mistral"</span></span>
-<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"ollama:codellama"</span></span>
-<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>No API key needed. Requires Ollama running locally.</span>
-<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>Setup:</span>
-<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Install Ollama: https://ollama.ai</span></span>
-<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull llama3</span>
-<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="fu">### AWS Bedrock</span></span>
-<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"bedrock:anthropic.claude-sonnet-5-5"</span></span>
-<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>For an OpenAI-compatible server or gateway (vLLM, LiteLLM, etc.), also</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>set <span class="in">`OPENAI_BASE_URL`</span> to its URL; the requests then go to its Chat</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>Completions endpoint.</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="fu">### Ollama (local)</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"ollama:llama3"</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"ollama:mistral"</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"ollama:codellama"</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>No API key needed. Requires Ollama running locally.</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>Setup:</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Install Ollama: https://ollama.ai</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull llama3</span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="fu">### AWS Bedrock</span></span>
 <span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>Uses AWS credentials from the environment (AWS_ACCESS_KEY_ID,</span>
-<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION) or AWS profiles; <span class="in">`api_key`</span></span>
-<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>and <span class="in">`verify_ssl`</span> aren't used. Bedrock goes through <span class="in">`anthropic[bedrock]`</span>,</span>
-<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>which brings in boto3.</span>
-<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a><span class="fu">### Azure OpenAI</span></span>
-<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"azure-openai:my-deployment-name"</span>   <span class="co"># the Azure deployment id</span></span>
-<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"bedrock:anthropic.claude-sonnet-5-5"</span></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>Uses AWS credentials from the environment (AWS_ACCESS_KEY_ID,</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION) or AWS profiles; <span class="in">`api_key`</span></span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>and <span class="in">`verify_ssl`</span> aren't used. Bedrock goes through <span class="in">`anthropic[bedrock]`</span>,</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>which brings in boto3.</span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a><span class="fu">### Azure OpenAI</span></span>
 <span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>Environment variables:</span>
-<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`AZURE_OPENAI_API_KEY`</span> (or pass <span class="in">`api_key=`</span>)</span>
-<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`AZURE_OPENAI_ENDPOINT`</span> (e.g., <span class="in">`https://&lt;resource&gt;.openai.azure.com`</span>)</span>
-<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`OPENAI_API_VERSION`</span> (e.g., <span class="in">`2024-06-01`</span>)</span>
-<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>A missing endpoint or API version raises a <span class="in">`ValueError`</span>.</span>
-<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a><span class="fu">### Cohere</span></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"azure-openai:my-deployment-name"</span>   <span class="co"># the Azure deployment id</span></span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>Environment variables:</span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`AZURE_OPENAI_API_KEY`</span> (or pass <span class="in">`api_key=`</span>)</span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`AZURE_OPENAI_ENDPOINT`</span> (e.g., <span class="in">`https://&lt;resource&gt;.openai.azure.com`</span>)</span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`OPENAI_API_VERSION`</span> (e.g., <span class="in">`2024-06-01`</span>)</span>
 <span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"cohere:command-a-03-2025"</span></span>
-<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a>A missing endpoint or API version raises a <span class="in">`ValueError`</span>.</span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a><span class="fu">### Cohere</span></span>
 <span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a>Environment variable: <span class="in">`CO_API_KEY`</span> (or <span class="in">`COHERE_API_KEY`</span>). Requests go</span>
-<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a>to Cohere's OpenAI-compatible API, so this uses the OpenAI SDK.</span>
-<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a><span class="fu">## API key options</span></span>
-<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a><span class="fu">### Environment variables (recommended)</span></span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"cohere:command-a-03-2025"</span></span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a>Environment variable: <span class="in">`CO_API_KEY`</span> (or <span class="in">`COHERE_API_KEY`</span>). Requests go</span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a>to Cohere's OpenAI-compatible API, so this uses the OpenAI SDK.</span>
 <span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ANTHROPIC_API_KEY</span><span class="op">=</span><span class="st">"sk-ant-..."</span></span>
-<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">OPENAI_API_KEY</span><span class="op">=</span><span class="st">"sk-..."</span></span>
-<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a><span class="fu">### Explicit in code</span></span>
-<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a>draft <span class="op">=</span> pb.DraftValidation(</span>
-<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df,</span>
-<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-6"</span>,</span>
-<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a>    api_key<span class="op">=</span><span class="st">"sk-ant-..."</span>,</span>
-<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a><span class="fu">### Databricks</span></span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a>model<span class="op">=</span><span class="st">"databricks:databricks-claude-sonnet-4-6"</span>   <span class="co"># the serving endpoint name</span></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a>Needs <span class="in">`pip install databricks-sdk`</span> (it isn't in the <span class="in">`generate`</span> extra)</span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a>and chatlas 0.13.2 or later. The SDK signs in with <span class="in">`DATABRICKS_HOST`</span></span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a>and <span class="in">`DATABRICKS_TOKEN`</span>, a profile in <span class="in">`~/.databrickscfg`</span>, or a Databricks</span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a>notebook's own credentials; <span class="in">`api_key=`</span> is used as a personal access</span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a>token. <span class="in">`verify_ssl=False`</span> raises a <span class="in">`ValueError`</span> (set <span class="in">`SSL_CERT_FILE`</span> to</span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a>trust a custom certificate authority instead).</span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a><span class="fu">## API key options</span></span>
 <span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a><span class="fu">### SSL verification</span></span>
+<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a><span class="fu">### Environment variables (recommended)</span></span>
 <span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a>For environments with custom certificates:</span>
-<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a>draft <span class="op">=</span> pb.DraftValidation(</span>
-<span id="cb11-103"><a href="#cb11-103" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df,</span>
-<span id="cb11-104"><a href="#cb11-104" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-6"</span>,</span>
-<span id="cb11-105"><a href="#cb11-105" aria-hidden="true" tabindex="-1"></a>    verify_ssl<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb11-106"><a href="#cb11-106" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-107"><a href="#cb11-107" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-108"><a href="#cb11-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-109"><a href="#cb11-109" aria-hidden="true" tabindex="-1"></a><span class="fu">## Feature support by function</span></span>
-<span id="cb11-110"><a href="#cb11-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-111"><a href="#cb11-111" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Feature            <span class="pp">|</span> DraftValidation <span class="pp">|</span> EditValidation <span class="pp">|</span> assistant() <span class="pp">|</span></span>
-<span id="cb11-112"><a href="#cb11-112" aria-hidden="true" tabindex="-1"></a><span class="pp">|--------------------|</span>:-:<span class="pp">|</span>:-:<span class="pp">|</span>:-:<span class="pp">|</span></span>
-<span id="cb11-113"><a href="#cb11-113" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Anthropic          <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
-<span id="cb11-114"><a href="#cb11-114" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> OpenAI             <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
-<span id="cb11-115"><a href="#cb11-115" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Ollama             <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
-<span id="cb11-116"><a href="#cb11-116" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Bedrock            <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
-<span id="cb11-117"><a href="#cb11-117" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Azure OpenAI       <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
-<span id="cb11-118"><a href="#cb11-118" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cohere             <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
-<span id="cb11-119"><a href="#cb11-119" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`api_key`</span> param    <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
-<span id="cb11-120"><a href="#cb11-120" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`verify_ssl`</span> param <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> no  <span class="pp">|</span></span>
-<span id="cb11-121"><a href="#cb11-121" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`max_reprompts`</span>    <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> no  <span class="pp">|</span></span>
-<span id="cb11-122"><a href="#cb11-122" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`data`</span> param       <span class="pp">|</span> required <span class="pp">|</span> optional <span class="pp">|</span> optional <span class="pp">|</span></span>
-<span id="cb11-123"><a href="#cb11-123" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Browser display    <span class="pp">|</span> no  <span class="pp">|</span> no  <span class="pp">|</span> yes <span class="pp">|</span></span>
-<span id="cb11-124"><a href="#cb11-124" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Terminal display   <span class="pp">|</span> no  <span class="pp">|</span> no  <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">ANTHROPIC_API_KEY</span><span class="op">=</span><span class="st">"sk-ant-..."</span></span>
+<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">OPENAI_API_KEY</span><span class="op">=</span><span class="st">"sk-..."</span></span>
+<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-103"><a href="#cb11-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-104"><a href="#cb11-104" aria-hidden="true" tabindex="-1"></a><span class="fu">### Explicit in code</span></span>
+<span id="cb11-105"><a href="#cb11-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-106"><a href="#cb11-106" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb11-107"><a href="#cb11-107" aria-hidden="true" tabindex="-1"></a>draft <span class="op">=</span> pb.DraftValidation(</span>
+<span id="cb11-108"><a href="#cb11-108" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df,</span>
+<span id="cb11-109"><a href="#cb11-109" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-6"</span>,</span>
+<span id="cb11-110"><a href="#cb11-110" aria-hidden="true" tabindex="-1"></a>    api_key<span class="op">=</span><span class="st">"sk-ant-..."</span>,</span>
+<span id="cb11-111"><a href="#cb11-111" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-112"><a href="#cb11-112" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-113"><a href="#cb11-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-114"><a href="#cb11-114" aria-hidden="true" tabindex="-1"></a><span class="fu">### SSL verification</span></span>
+<span id="cb11-115"><a href="#cb11-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-116"><a href="#cb11-116" aria-hidden="true" tabindex="-1"></a>For environments with custom certificates:</span>
+<span id="cb11-117"><a href="#cb11-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-118"><a href="#cb11-118" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb11-119"><a href="#cb11-119" aria-hidden="true" tabindex="-1"></a>draft <span class="op">=</span> pb.DraftValidation(</span>
+<span id="cb11-120"><a href="#cb11-120" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df,</span>
+<span id="cb11-121"><a href="#cb11-121" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span><span class="st">"anthropic:claude-sonnet-4-6"</span>,</span>
+<span id="cb11-122"><a href="#cb11-122" aria-hidden="true" tabindex="-1"></a>    verify_ssl<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb11-123"><a href="#cb11-123" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-124"><a href="#cb11-124" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb11-125"><a href="#cb11-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-126"><a href="#cb11-126" aria-hidden="true" tabindex="-1"></a><span class="in">`EditValidation.from_plans()`</span> doesn't call a model, so it needs no</span>
-<span id="cb11-127"><a href="#cb11-127" aria-hidden="true" tabindex="-1"></a>provider at all.</span></code></pre></div>
+<span id="cb11-126"><a href="#cb11-126" aria-hidden="true" tabindex="-1"></a><span class="fu">## Feature support by function</span></span>
+<span id="cb11-127"><a href="#cb11-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-128"><a href="#cb11-128" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Feature            <span class="pp">|</span> DraftValidation <span class="pp">|</span> EditValidation <span class="pp">|</span> assistant() <span class="pp">|</span></span>
+<span id="cb11-129"><a href="#cb11-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|--------------------|</span>:-:<span class="pp">|</span>:-:<span class="pp">|</span>:-:<span class="pp">|</span></span>
+<span id="cb11-130"><a href="#cb11-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Anthropic          <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-131"><a href="#cb11-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> OpenAI             <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-132"><a href="#cb11-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Ollama             <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-133"><a href="#cb11-133" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Bedrock            <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-134"><a href="#cb11-134" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Azure OpenAI       <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-135"><a href="#cb11-135" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cohere             <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-136"><a href="#cb11-136" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Databricks         <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-137"><a href="#cb11-137" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`api_key`</span> param    <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-138"><a href="#cb11-138" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`verify_ssl`</span> param <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> no  <span class="pp">|</span></span>
+<span id="cb11-139"><a href="#cb11-139" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`max_reprompts`</span>    <span class="pp">|</span> yes <span class="pp">|</span> yes <span class="pp">|</span> no  <span class="pp">|</span></span>
+<span id="cb11-140"><a href="#cb11-140" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`data`</span> param       <span class="pp">|</span> required <span class="pp">|</span> optional <span class="pp">|</span> optional <span class="pp">|</span></span>
+<span id="cb11-141"><a href="#cb11-141" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Browser display    <span class="pp">|</span> no  <span class="pp">|</span> no  <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-142"><a href="#cb11-142" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Terminal display   <span class="pp">|</span> no  <span class="pp">|</span> no  <span class="pp">|</span> yes <span class="pp">|</span></span>
+<span id="cb11-143"><a href="#cb11-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-144"><a href="#cb11-144" aria-hidden="true" tabindex="-1"></a><span class="in">`EditValidation.from_plans()`</span> doesn't call a model, so it needs no</span>
+<span id="cb11-145"><a href="#cb11-145" aria-hidden="true" tabindex="-1"></a>provider at all.</span></code></pre></div>
 </pre>
 </div>
 <div class="gd-skill-panel" hidden="">
@@ -6309,6 +6331,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="./copy-page.js"></script>
 <script src="./sidebar-wrap.js"></script>
 <script src="./sidebar-float.js"></script>
+<script src="./sticky-sidebars.js"></script>
 <script src="./sidebar-filter.js"></script>
 <script src="./dark-mode-toggle.js"></script>
 <script src="./back-to-top.js"></script>

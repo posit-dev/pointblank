@@ -2386,7 +2386,7 @@ description: >
   modifying existing plans with natural language (and reviewing the
   change before accepting it), and the interactive assistant() chat
   interface. Supports Anthropic, OpenAI, Ollama, Bedrock, Azure OpenAI,
-  and Cohere providers. Use when bootstrapping validation for a new
+  Cohere, and Databricks providers. Use when bootstrapping validation for a new
   dataset or refining existing plans.
 license: MIT
 compatibility: Requires Python >=3.10, pointblank installed, plus an LLM provider SDK.
@@ -2640,6 +2640,9 @@ model="azure-openai:my-deployment-name"
 
 # Cohere
 model="cohere:command-a-03-2025"
+
+# Databricks (the part after the colon is the serving endpoint name)
+model="databricks:databricks-claude-sonnet-4-6"
 ```
 
 ### API key handling
@@ -2654,6 +2657,7 @@ By default, the API key is read from environment variables:
 | Bedrock      | AWS credentials                                                |
 | Azure OpenAI | `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT`, `OPENAI_API_VERSION` |
 | Cohere       | `CO_API_KEY` (or `COHERE_API_KEY`)                             |
+| Databricks   | `DATABRICKS_HOST`, `DATABRICKS_TOKEN` (or a `~/.databrickscfg` profile) |
 
 Or pass explicitly:
 
@@ -2765,6 +2769,10 @@ model="openai:gpt-5.6-sol"
 
 Environment variable: `OPENAI_API_KEY`
 
+For an OpenAI-compatible server or gateway (vLLM, LiteLLM, etc.), also
+set `OPENAI_BASE_URL` to its URL; the requests then go to its Chat
+Completions endpoint.
+
 ### Ollama (local)
 
 ```python
@@ -2814,6 +2822,19 @@ model="cohere:command-a-03-2025"
 Environment variable: `CO_API_KEY` (or `COHERE_API_KEY`). Requests go
 to Cohere's OpenAI-compatible API, so this uses the OpenAI SDK.
 
+### Databricks
+
+```python
+model="databricks:databricks-claude-sonnet-4-6"   # the serving endpoint name
+```
+
+Needs `pip install databricks-sdk` (it isn't in the `generate` extra)
+and chatlas 0.13.2 or later. The SDK signs in with `DATABRICKS_HOST`
+and `DATABRICKS_TOKEN`, a profile in `~/.databrickscfg`, or a Databricks
+notebook's own credentials; `api_key=` is used as a personal access
+token. `verify_ssl=False` raises a `ValueError` (set `SSL_CERT_FILE` to
+trust a custom certificate authority instead).
+
 ## API key options
 
 ### Environment variables (recommended)
@@ -2855,6 +2876,7 @@ draft = pb.DraftValidation(
 | Bedrock            | yes | yes | yes |
 | Azure OpenAI       | yes | yes | yes |
 | Cohere             | yes | yes | yes |
+| Databricks         | yes | yes | yes |
 | `api_key` param    | yes | yes | yes |
 | `verify_ssl` param | yes | yes | no  |
 | `max_reprompts`    | yes | yes | no  |

@@ -4,7 +4,7 @@ Return a unified textual diff of the original plan versus the revised plan.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L517-L568)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L520-L571)
 
 ``` python
 diff()

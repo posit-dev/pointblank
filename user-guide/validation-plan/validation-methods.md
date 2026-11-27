@@ -710,9 +710,9 @@ products = pl.DataFrame({
 
 The `columns_subset=` parameter lets you specify which columns to include in the validation, improving performance and reducing API costs by only sending relevant data to the LLM.
 
-**Note:** To use [`Validate.prompt()`](../../reference/Validate.prompt.md#pointblank.Validate.prompt), you need to have the appropriate API credentials configured for your chosen LLM provider (Anthropic, OpenAI, Ollama, AWS Bedrock, Azure OpenAI, or Cohere).
+**Note:** To use [`Validate.prompt()`](../../reference/Validate.prompt.md#pointblank.Validate.prompt), you need to have the appropriate API credentials configured for your chosen LLM provider (Anthropic, OpenAI, Ollama, AWS Bedrock, Azure OpenAI, Cohere, or Databricks).
 
-For **Azure OpenAI**, use `model="azure-openai:<deployment_id>"` where `<deployment_id>` is the name you assigned when deploying the model in your Azure OpenAI resource. In addition to `AZURE_OPENAI_API_KEY`, you must set `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`) and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) in your environment. For **Cohere**, use `model="cohere:<model>"` (e.g., `"cohere:command-a-03-2025"`) with the `CO_API_KEY` environment variable set.
+For **Azure OpenAI**, use `model="azure-openai:<deployment_id>"` where `<deployment_id>` is the name you assigned when deploying the model in your Azure OpenAI resource. In addition to `AZURE_OPENAI_API_KEY`, you must set `AZURE_OPENAI_ENDPOINT` (e.g., `https://<resource>.openai.azure.com`) and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) in your environment. For **Cohere**, use `model="cohere:<model>"` (e.g., `"cohere:command-a-03-2025"`) with the `CO_API_KEY` environment variable set. For **Databricks**, use `model="databricks:<endpoint>"` (e.g., `"databricks:databricks-claude-sonnet-4-6"`) with the `databricks-sdk` package installed and `DATABRICKS_HOST` and `DATABRICKS_TOKEN` set (or a profile in `~/.databrickscfg`).
 
 A single model can be wrong about a row. With a list of models in `model=`, each model judges every row and the verdicts are combined with `aggregate=` (`"majority"`, `"all"`, or `"any"`):
 

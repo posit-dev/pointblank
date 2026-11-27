@@ -4,7 +4,7 @@ Return a `great_tables` GT object summarizing the step-level changes.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L622-L695)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L625-L698)
 
 ``` python
 review()

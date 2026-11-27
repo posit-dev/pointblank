@@ -4,7 +4,7 @@ Check whether the revised plan parses and uses only known validation methods.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L482-L515)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L485-L518)
 
 ``` python
 validate_syntax()

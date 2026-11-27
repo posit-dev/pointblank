@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-d115e8fe119fec3d8a9be5efe5eb78bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-16c2c2c5529e599bbe6a41763d9257cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -2082,7 +2082,7 @@ A dictionary with the comparison settings (<code>"source_name"</code>, <code>"ta
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s compare two months of an employee table and turn the result into a dictionary.</p>
-<div id="7efd7363" class="cell" data-execution_count="2">
+<div id="42c25996" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2105,7 +2105,7 @@ A dictionary with the comparison settings (<code>"source_name"</code>, <code>"ta
 </div>
 </div>
 <p>The samples hold the actual rows, keyed by status:</p>
-<div id="d4aed8fd" class="cell" data-execution_count="3">
+<div id="52cdcc48" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result[<span class="st">"samples"</span>]</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>{'changed': [{'emp_id': 102, 'salary_source': 61000, 'salary_target': 63500}],
@@ -2114,7 +2114,7 @@ A dictionary with the comparison settings (<code>"source_name"</code>, <code>"ta
 </div>
 </div>
 <p>Salaries are sensitive, so a record that’s kept in a shared log might leave the samples out. With <code>samples=False</code>, only counts, settings, and schema details remain:</p>
-<div id="cd672f63" class="cell" data-execution_count="4">
+<div id="34414604" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>record <span class="op">=</span> comparison.to_dict(samples<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>{k: record[k] <span class="cf">for</span> k <span class="kw">in</span> [<span class="st">"source_name"</span>, <span class="st">"target_name"</span>, <span class="st">"n_failed"</span>, <span class="st">"identical"</span>]}</span></code></pre></div>
@@ -2563,6 +2563,7 @@ A dictionary with the comparison settings (<code>"source_name"</code>, <code>"ta
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>
+<script src="../sticky-sidebars.js"></script>
 <script src="../sidebar-filter.js"></script>
 <script src="../dark-mode-toggle.js"></script>
 <script src="../back-to-top.js"></script>

@@ -4,7 +4,7 @@ Perform a specialized validation with customized logic.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19071-L19434)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L19079-L19442)
 
 ``` python
 Validate.specially(

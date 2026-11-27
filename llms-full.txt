@@ -1337,9 +1337,10 @@ By using a large language model (LLM) to draft a validation plan, you can quickl
 starting point for validating a table. This can be useful when you have a new table and you
 want to get a sense of how to validate it (and adjustments could always be made later). The
 `DraftValidation` class uses the `chatlas` package to draft a validation plan for a given table
-using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`, or
-`"cohere"` provider. You can install all requirements for the class through an optional
-'generate' install of Pointblank via `pip install pointblank[generate]`.
+using an LLM from the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`,
+`"cohere"`, or `"databricks"` provider. You can install all requirements for the class through
+an optional 'generate' install of Pointblank via `pip install pointblank[generate]` (the
+`"databricks"` provider also needs the `databricks-sdk` package).
 
 :::{.callout-warning}
 The `DraftValidation` class is still experimental. Please report any issues you encounter in
@@ -1358,8 +1359,9 @@ the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
 
 :   The model to be used. This should be in the form of `provider:model` (e.g.,
     `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-    `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`. For `"azure-openai"`, the value
-    after the colon is the Azure *deployment id*, not an OpenAI model id.
+    `"ollama"`, `"bedrock"`, `"azure-openai"`, `"cohere"`, and `"databricks"`. For
+    `"azure-openai"`, the value after the colon is the Azure *deployment id*, not an OpenAI
+    model id, and for `"databricks"` it's the name of a serving endpoint.
 
 <code>[api_key]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [str | None]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -1370,7 +1372,7 @@ the [Pointblank issue tracker](https://github.com/posit-dev/pointblank/issues).
 :   Whether to verify SSL certificates when making requests to the LLM provider. Set to `False`
     to disable SSL verification (e.g., when behind a corporate firewall with self-signed
     certificates). Defaults to `True`. Use with caution as disabling SSL verification can pose
-    security risks.
+    security risks. This isn't supported for the `"databricks"` provider.
 
 <code>[max_reprompts]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [int]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [[1]{.dv}]{.doc-parameter-default}</code>
 
@@ -1412,6 +1414,7 @@ colon (`provider:model`). The provider text can any of:
 - `"bedrock"` (Amazon Bedrock)
 - `"azure-openai"` (Azure OpenAI)
 - `"cohere"` (Cohere)
+- `"databricks"` (Databricks)
 
 The model name should be the specific model to be used from the provider. Model names are
 subject to change so consult the provider's documentation for the most up-to-date model names.
@@ -1421,6 +1424,19 @@ environment variables `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_ENDPOINT` (e.g.,
 `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) to
 be set. For `"cohere"`, the API key is read from `CO_API_KEY` (or `COHERE_API_KEY`) if
 `api_key=` isn't given, and the requests go to Cohere's OpenAI-compatible API.
+
+For `"databricks"`, the value after the colon is the name of a Model Serving endpoint in your
+workspace (e.g., `"databricks:databricks-claude-sonnet-4-6"`). It needs the `databricks-sdk`
+package (`pip install databricks-sdk`) and chatlas 0.13.2 or later. The `databricks-sdk`
+package handles signing in: through the
+`DATABRICKS_HOST` and `DATABRICKS_TOKEN` environment variables, a profile in
+`~/.databrickscfg`, or a Databricks notebook's own credentials. If `api_key=` is given, it's
+used as a personal access token.
+
+For `"openai"`, if the `OPENAI_BASE_URL` environment variable is set, the requests go to the
+Chat Completions endpoint at that URL instead of to OpenAI. This is a way to use an
+OpenAI-compatible server or gateway (such as vLLM or LiteLLM), with `OPENAI_API_KEY` (or
+`api_key=`) as its key.
 
 ## Notes On Authentication {.doc-notes-on-authentication}
 
@@ -1637,8 +1653,10 @@ human in control.
 
 `EditValidation` reuses the same provider abstraction as `DraftValidation` (via the `chatlas`
 package), supporting the `"anthropic"`, `"openai"`, `"ollama"`, `"bedrock"`, `"azure-openai"`,
-and `"cohere"` providers. Install the optional requirements with
-`pip install pointblank[generate]`.
+`"cohere"`, and `"databricks"` providers. Install the optional requirements with
+`pip install pointblank[generate]` (the `"databricks"` provider also needs the `databricks-sdk`
+package). See [`DraftValidation`](`pointblank.DraftValidation`) for how each provider is set
+up.
 
 :::{.callout-warning}
 The `EditValidation` class is experimental. Please report any issues you encounter in the
@@ -1665,7 +1683,7 @@ The `EditValidation` class is experimental. Please report any issues you encount
 
 :   The model to be used. This should be in the form of `provider:model` (e.g.,
     `"anthropic:claude-opus-4-8"`). Supported providers are `"anthropic"`, `"openai"`,
-    `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`.
+    `"ollama"`, `"bedrock"`, `"azure-openai"`, `"cohere"`, and `"databricks"`.
 
 <code>[data]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [Any]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [None]{.doc-parameter-default}</code>
 
@@ -1682,7 +1700,8 @@ The `EditValidation` class is experimental. Please report any issues you encount
 <code>[verify_ssl]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [bool]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [[True]{.va}]{.doc-parameter-default}</code>
 
 :   Whether to verify SSL certificates when making requests to the LLM provider. Defaults to
-    `True`. Use with caution as disabling SSL verification can pose security risks.
+    `True`. Use with caution as disabling SSL verification can pose security risks. This isn't
+    supported for the `"databricks"` provider.
 
 <code>[max_reprompts]{.doc-parameter-name}[:]{.doc-parameter-annotation-sep} [int]{.doc-parameter-annotation} [=]{.doc-parameter-default-sep .op} [[1]{.dv}]{.doc-parameter-default}</code>
 
@@ -17469,9 +17488,10 @@ subjective quality assessments.
 
 :   The model to be used. This should be in the form of `provider:model` (e.g.,
     `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-    `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`. The model name should be the
-    specific model to be used from the provider (for `"azure-openai"`, the value after the
-    colon is the Azure *deployment id*). Model names are subject to change so consult the
+    `"ollama"`, `"bedrock"`, `"azure-openai"`, `"cohere"`, and `"databricks"`. The model
+    name should be the specific model to be used from the provider (for `"azure-openai"`,
+    the value after the colon is the Azure *deployment id*, and for `"databricks"`, the
+    name of a serving endpoint). Model names are subject to change so consult the
     provider's documentation for the most up-to-date model names. A list of models makes
     each of them a judge of every row, with their verdicts combined by `aggregate=` (see
     the *Several Judges* section).
@@ -17565,12 +17585,14 @@ colon (`provider:model`). The provider text can any of:
 - `"bedrock"` (Amazon Bedrock)
 - `"azure-openai"` (Azure OpenAI)
 - `"cohere"` (Cohere)
+- `"databricks"` (Databricks)
 
 The model name should be the specific model to be used from the provider. Model names are
 subject to change so consult the provider's documentation for the most up-to-date model
 names. For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the
 name you assigned when deploying the model in your Azure OpenAI resource), not an OpenAI
-model id.
+model id. For `"databricks"`, it's the name of a Model Serving endpoint in your workspace
+(e.g., `"databricks:databricks-claude-sonnet-4-6"`).
 
 ## Notes On Authentication {.doc-notes-on-authentication}
 
@@ -17597,7 +17619,9 @@ this way.
 
 **Provider-specific setup**:
 
-- **OpenAI**: set `OPENAI_API_KEY` environment variable or create `.env` file
+- **OpenAI**: set `OPENAI_API_KEY` environment variable or create `.env` file (to use an
+  OpenAI-compatible server or gateway, also set `OPENAI_BASE_URL` to its URL, and the
+  requests go to its Chat Completions endpoint)
 - **Anthropic**: set `ANTHROPIC_API_KEY` environment variable or create `.env` file
 - **Ollama**: no API key required, just ensure Ollama is running locally
 - **Bedrock**: configure AWS credentials through standard AWS methods
@@ -17605,6 +17629,9 @@ this way.
   `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`)
 - **Cohere**: set the `CO_API_KEY` (or `COHERE_API_KEY`) environment variable (the requests
   go to Cohere's OpenAI-compatible API, so the `openai` package is needed)
+- **Databricks**: install the `databricks-sdk` package (and chatlas 0.13.2 or later); it
+  signs in through the `DATABRICKS_HOST` and `DATABRICKS_TOKEN` environment variables, a
+  profile in `~/.databrickscfg`, or a Databricks notebook's own credentials
 
 ## Several Judges {.doc-several-judges}
 
@@ -49801,14 +49828,17 @@ The `columns_subset=` parameter lets you specify which columns to include in the
 improving performance and reducing API costs by only sending relevant data to the LLM.
 
 **Note:** To use [`Validate.prompt()`](`Validate.prompt`), you need to have the appropriate API credentials configured
-for your chosen LLM provider (Anthropic, OpenAI, Ollama, AWS Bedrock, Azure OpenAI, or Cohere).
+for your chosen LLM provider (Anthropic, OpenAI, Ollama, AWS Bedrock, Azure OpenAI, Cohere, or
+Databricks).
 
 For **Azure OpenAI**, use `model="azure-openai:<deployment_id>"` where `<deployment_id>` is the
 name you assigned when deploying the model in your Azure OpenAI resource. In addition to
 `AZURE_OPENAI_API_KEY`, you must set `AZURE_OPENAI_ENDPOINT` (e.g.,
 `https://<resource>.openai.azure.com`) and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`) in your
 environment. For **Cohere**, use `model="cohere:<model>"` (e.g., `"cohere:command-a-03-2025"`) with
-the `CO_API_KEY` environment variable set.
+the `CO_API_KEY` environment variable set. For **Databricks**, use `model="databricks:<endpoint>"`
+(e.g., `"databricks:databricks-claude-sonnet-4-6"`) with the `databricks-sdk` package installed
+and `DATABRICKS_HOST` and `DATABRICKS_TOKEN` set (or a profile in `~/.databrickscfg`).
 
 A single model can be wrong about a row. With a list of models in `model=`, each model judges every
 row and the verdicts are combined with `aggregate=` (`"majority"`, `"all"`, or `"any"`):
@@ -53508,6 +53538,7 @@ The `DraftValidation` class supports multiple LLM providers:
 - **Amazon Bedrock** (AWS-hosted models)
 - **Azure OpenAI** (OpenAI models deployed on Azure)
 - **Cohere** (Command models, through Cohere's OpenAI-compatible API)
+- **Databricks** (models served from a Databricks workspace; needs `pip install databricks-sdk`)
 
 Each provider has different capabilities and performance characteristics, but all can be used to
 generate validation plans through a consistent interface.
@@ -53638,6 +53669,10 @@ OPENAI_API_VERSION=2025-03-01-preview
 
 # For Cohere:
 CO_API_KEY=your_cohere_api_key_here
+
+# For Databricks (or use a profile in ~/.databrickscfg):
+DATABRICKS_HOST=https://your-workspace.cloud.databricks.com
+DATABRICKS_TOKEN=your_databricks_personal_access_token_here
 ```
 
 If your API keys have standard names (like `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`),
@@ -53792,6 +53827,32 @@ pb.DraftValidation(data=data, model="azure-openai:my-gpt4-deployment")
 
 # Using Cohere (requires the CO_API_KEY env var)
 pb.DraftValidation(data=data, model="cohere:command-a-03-2025")
+
+# Using a Databricks serving endpoint (the value after the colon is the endpoint name)
+pb.DraftValidation(data=data, model="databricks:databricks-claude-sonnet-4-6")
+```
+
+### Databricks and OpenAI-Compatible Servers
+
+The `databricks` provider sends requests to a Model Serving endpoint in your Databricks workspace.
+It needs chatlas 0.13.2 or later and the `databricks-sdk` package (`pip install databricks-sdk`),
+which takes care of signing in: with the `DATABRICKS_HOST` and `DATABRICKS_TOKEN` environment variables, with a profile in
+`~/.databrickscfg`, or (in a Databricks notebook) with the notebook's own credentials. If you pass
+`api_key=`, it's used as a personal access token. The `verify_ssl=False` option isn't available for
+this provider, but you can point the `SSL_CERT_FILE` environment variable to a certificate bundle
+if your network needs a custom certificate authority.
+
+For other servers and gateways with an OpenAI-compatible API (such as vLLM or LiteLLM), use the
+`openai` provider and set the `OPENAI_BASE_URL` environment variable to the server's URL. The
+requests then go to that server's Chat Completions endpoint, with `OPENAI_API_KEY` (or `api_key=`)
+as the key:
+
+```python
+import os
+
+os.environ["OPENAI_BASE_URL"] = "https://llm-gateway.example.com/v1"
+
+pb.DraftValidation(data=data, model="openai:my-gateway-model")
 ```
 
 ### Model Performance and Privacy
@@ -54225,8 +54286,8 @@ a supported LLM provider and the optional dependencies, installed with:
 pip install pointblank[generate]
 ```
 
-The same six providers are supported (`anthropic`, `openai`, `ollama`, `bedrock`, `azure-openai`,
-and `cohere`), the model is specified in `provider:model` form, and API keys are resolved from the
+The same seven providers are supported (`anthropic`, `openai`, `ollama`, `bedrock`,
+`azure-openai`, `cohere`, and `databricks`), the model is specified in `provider:model` form, and API keys are resolved from the
 `api_key=` argument, environment variables, or a `.env` file exactly as described on the Draft
 Validation page.
 

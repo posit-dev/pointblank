@@ -4,7 +4,7 @@ Return the revised validation plan as Python code.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L447-L480)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L450-L483)
 
 ``` python
 to_code()

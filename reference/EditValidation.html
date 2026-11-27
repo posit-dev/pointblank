@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-d115e8fe119fec3d8a9be5efe5eb78bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-16c2c2c5529e599bbe6a41763d9257cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -2048,7 +2048,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L102-L801" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L102-L804" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">EditValidation</span>(</span>
@@ -2063,7 +2063,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-text">
 <p>While <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link"><code>DraftValidation</code></a> generates a validation plan from scratch by profiling a table, <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> takes an <em>existing</em> plan plus a natural-language instruction (e.g., “add a freshness check on <code>updated_at</code>, tighten the email regex, and drop the <code>price &gt; 0</code> check”) and produces a revised plan. You review the change as a diff and explicitly <a href="../reference/pointblank.EditValidation.accept.html" class="gdls-link"><code>accept()</code></a> it before anything runs, keeping a human in control.</p>
-<p><a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> reuses the same provider abstraction as <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> (via the <code>chatlas</code> package), supporting the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, <code>"azure-openai"</code>, and <code>"cohere"</code> providers. Install the optional requirements with <code>pip install pointblank[generate]</code>.</p>
+<p><a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> reuses the same provider abstraction as <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> (via the <code>chatlas</code> package), supporting the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, <code>"azure-openai"</code>, <code>"cohere"</code>, and <code>"databricks"</code> providers. Install the optional requirements with <code>pip install pointblank[generate]</code> (the <code>"databricks"</code> provider also needs the <code>databricks-sdk</code> package). See <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link"><code>DraftValidation</code></a> for how each provider is set up.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -2092,7 +2092,7 @@ Warning
 </dd>
 <dt><code><span class="doc-parameter-name">model</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-opus-4-8"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, <code>"azure-openai"</code>, and <code>"cohere"</code>.</p>
+<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-opus-4-8"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, <code>"azure-openai"</code>, <code>"cohere"</code>, and <code>"databricks"</code>.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">data</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2104,7 +2104,7 @@ Warning
 </dd>
 <dt><code><span class="doc-parameter-name">verify_ssl</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-<p>Whether to verify SSL certificates when making requests to the LLM provider. Defaults to <code>True</code>. Use with caution as disabling SSL verification can pose security risks.</p>
+<p>Whether to verify SSL certificates when making requests to the LLM provider. Defaults to <code>True</code>. Use with caution as disabling SSL verification can pose security risks. This isn’t supported for the <code>"databricks"</code> provider.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">max_reprompts</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">1</span></span></code></dt>
 <dd>
@@ -2152,7 +2152,7 @@ An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="g
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>plan <span class="op">=</span> edited.accept()      <span class="co"># a Validate you can .interrogate()</span></span></code></pre></div>
 <p>Nothing runs when the <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> object is created, apart from the call to the model. The diff shows the revised plan line by line against the original, and only <a href="../reference/pointblank.EditValidation.accept.html" class="gdls-link gdls-code">accept()</a> turns the revised code into a <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gdls-code">Validate</a> object, using the <code>data=</code> given here because none is passed to <a href="../reference/pointblank.EditValidation.accept.html" class="gdls-link gdls-code">accept()</a>. Because <code>data=</code> was given, the model also saw a summary of the table, which helps with edits like choosing a new bound.</p>
 <p>The review methods don’t depend on the model, and <a href="../reference/pointblank.EditValidation.from_plans.html" class="gdls-link"><code>from_plans()</code></a> builds an <a href="../reference/EditValidation.html#pointblank.EditValidation" class="gdls-link gdls-code">EditValidation</a> from two plans you already have. Here the revised plan makes the same changes that the instruction above asked for:</p>
-<div id="23eb22b1" class="cell" data-execution_count="2">
+<div id="c14a934b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>small_table <span class="op">=</span> pb.load_dataset(<span class="st">"small_table"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>original <span class="op">=</span> (</span>
@@ -2171,67 +2171,67 @@ An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="g
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>edit.review()</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
-<div id="cpnnhewfst" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="efpnbjfmay" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
-#cpnnhewfst table {
+#efpnbjfmay table {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#cpnnhewfst thead, tbody, tfoot, tr, td, th { border-style: none; }
+#efpnbjfmay thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#cpnnhewfst p { margin: 0; padding: 0; }
- #cpnnhewfst .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #cpnnhewfst .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #cpnnhewfst .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #cpnnhewfst .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #cpnnhewfst .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #cpnnhewfst .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #cpnnhewfst .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #cpnnhewfst .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #cpnnhewfst .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #cpnnhewfst .gt_column_spanner_outer:first-child { padding-left: 0; }
- #cpnnhewfst .gt_column_spanner_outer:last-child { padding-right: 0; }
- #cpnnhewfst .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #cpnnhewfst .gt_spanner_row { border-bottom-style: hidden; }
- #cpnnhewfst .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #cpnnhewfst .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #cpnnhewfst .gt_from_md> :first-child { margin-top: 0; }
- #cpnnhewfst .gt_from_md> :last-child { margin-bottom: 0; }
- #cpnnhewfst .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #cpnnhewfst .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #cpnnhewfst .gt_indent_1 { text-indent: 5px; }
- #cpnnhewfst .gt_indent_2 { text-indent: calc(5px * 2); }
- #cpnnhewfst .gt_indent_3 { text-indent: calc(5px * 3); }
- #cpnnhewfst .gt_indent_4 { text-indent: calc(5px * 4); }
- #cpnnhewfst .gt_indent_5 { text-indent: calc(5px * 5); }
- #cpnnhewfst .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #cpnnhewfst .gt_row_group_first td { border-top-width: 2px; }
- #cpnnhewfst .gt_row_group_first th { border-top-width: 2px; }
- #cpnnhewfst .gt_striped { color: #333333; background-color: #F4F4F4; }
- #cpnnhewfst .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #cpnnhewfst .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #cpnnhewfst .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #cpnnhewfst .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #cpnnhewfst .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #cpnnhewfst .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #cpnnhewfst .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #cpnnhewfst .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #cpnnhewfst .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #cpnnhewfst .gt_left { text-align: left; }
- #cpnnhewfst .gt_center { text-align: center; }
- #cpnnhewfst .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #cpnnhewfst .gt_font_normal { font-weight: normal; }
- #cpnnhewfst .gt_font_bold { font-weight: bold; }
- #cpnnhewfst .gt_font_italic { font-style: italic; }
- #cpnnhewfst .gt_super { font-size: 65%; }
- #cpnnhewfst .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #cpnnhewfst .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #cpnnhewfst .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #cpnnhewfst .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #cpnnhewfst .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #cpnnhewfst .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#efpnbjfmay p { margin: 0; padding: 0; }
+ #efpnbjfmay .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #efpnbjfmay .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #efpnbjfmay .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #efpnbjfmay .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #efpnbjfmay .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #efpnbjfmay .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #efpnbjfmay .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #efpnbjfmay .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #efpnbjfmay .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #efpnbjfmay .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #efpnbjfmay .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #efpnbjfmay .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #efpnbjfmay .gt_spanner_row { border-bottom-style: hidden; }
+ #efpnbjfmay .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #efpnbjfmay .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #efpnbjfmay .gt_from_md> :first-child { margin-top: 0; }
+ #efpnbjfmay .gt_from_md> :last-child { margin-bottom: 0; }
+ #efpnbjfmay .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #efpnbjfmay .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #efpnbjfmay .gt_indent_1 { text-indent: 5px; }
+ #efpnbjfmay .gt_indent_2 { text-indent: calc(5px * 2); }
+ #efpnbjfmay .gt_indent_3 { text-indent: calc(5px * 3); }
+ #efpnbjfmay .gt_indent_4 { text-indent: calc(5px * 4); }
+ #efpnbjfmay .gt_indent_5 { text-indent: calc(5px * 5); }
+ #efpnbjfmay .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #efpnbjfmay .gt_row_group_first td { border-top-width: 2px; }
+ #efpnbjfmay .gt_row_group_first th { border-top-width: 2px; }
+ #efpnbjfmay .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #efpnbjfmay .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #efpnbjfmay .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #efpnbjfmay .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #efpnbjfmay .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #efpnbjfmay .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #efpnbjfmay .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #efpnbjfmay .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #efpnbjfmay .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #efpnbjfmay .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #efpnbjfmay .gt_left { text-align: left; }
+ #efpnbjfmay .gt_center { text-align: center; }
+ #efpnbjfmay .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #efpnbjfmay .gt_font_normal { font-weight: normal; }
+ #efpnbjfmay .gt_font_bold { font-weight: bold; }
+ #efpnbjfmay .gt_font_italic { font-style: italic; }
+ #efpnbjfmay .gt_super { font-size: 65%; }
+ #efpnbjfmay .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #efpnbjfmay .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #efpnbjfmay .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #efpnbjfmay .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #efpnbjfmay .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #efpnbjfmay .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table class="gt_table" aria-labelledby="title" aria-describedby="subtitle" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
@@ -2762,6 +2762,7 @@ An <a href="../reference/EditValidation.html#pointblank.EditValidation" class="g
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>
+<script src="../sticky-sidebars.js"></script>
 <script src="../sidebar-filter.js"></script>
 <script src="../dark-mode-toggle.js"></script>
 <script src="../back-to-top.js"></script>

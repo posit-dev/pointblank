@@ -4,7 +4,7 @@ Validate whether the text of rows doesn't overlap with a reference, such as a be
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15539-L15790)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L15547-L15798)
 
 ``` python
 Validate.rows_not_contaminated(

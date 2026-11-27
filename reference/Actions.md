@@ -125,7 +125,7 @@ validation = (
 validation
 ```
 
-    Data quality issue found (2026-11-27 20:40:39.568867).
+    Data quality issue found (2026-11-27 22:02:23.695074).
 
 [TABLE]
 

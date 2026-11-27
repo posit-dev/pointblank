@@ -20,12 +20,32 @@
         initReferenceSwitcher();
     }
 
-    // Section metadata: id → { label, icon (Bootstrap Icons class), pathSegment }
+    // The Python logo in outline, from Tabler Icons (MIT): Bootstrap Icons has no
+    // Python logo. A stroke of 1.5 matches the weight of the Bootstrap Icons glyphs.
+    var PYTHON_ICON = '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none"'
+        + ' stroke="currentColor" stroke-width="1.5" stroke-linecap="round"'
+        + ' stroke-linejoin="round" aria-hidden="true">'
+        + '<path d="M12 9h-7a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h3"/>'
+        + '<path d="M12 15h7a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-3"/>'
+        + '<path d="M8 9v-4a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v5a2 2 0 0 1 -2 2h-4'
+        + 'a2 2 0 0 0 -2 2v5a2 2 0 0 0 2 2h4a2 2 0 0 0 2 -2v-4"/>'
+        + '<path d="M11 6l0 .01"/><path d="M13 18l0 .01"/>'
+        + '</svg>';
+
+    // Section metadata: id → { label, icon (Bootstrap Icons class), svg (an
+    // inline icon used instead of the class), pathSegment }
     var SECTIONS = {
-        api: { label: 'Python API', icon: 'bi-code-square', path: '' },
+        api: { label: 'Python', svg: PYTHON_ICON, path: '' },
         cli: { label: 'CLI', icon: 'bi-terminal', path: 'cli/' },
-        mcp: { label: 'MCP Server', icon: 'bi-cpu', path: 'mcp/' }
+        mcp: { label: 'MCP', icon: 'bi-plug', path: 'mcp/' }
     };
+
+    // The section's icon; an inline icon sits in the same `i.bi` element, so the
+    // switcher's icon styles size and fade both kinds alike.
+    function iconHtml(meta) {
+        if (meta.svg) return '<i class="bi gd-ref-svg-icon">' + meta.svg + '</i>';
+        return '<i class="bi ' + meta.icon + '"></i>';
+    }
 
     function getEnabledSections() {
         // Read from body data attribute (set by build)
@@ -100,7 +120,7 @@
             html += '<button class="reference-switcher-btn' + active + '"'
                   + ' data-ref="' + id + '"'
                   + ' title="' + meta.label + '">'
-                  + '<i class="bi ' + meta.icon + '"></i>'
+                  + iconHtml(meta)
                   + '<span>' + meta.label + '</span>'
                   + '</button>';
         }
@@ -123,7 +143,7 @@
         var currentMeta = SECTIONS[current] || { label: current, icon: '', path: current + '/' };
         var html = '<div class="reference-switcher-dropdown">';
         html += '<button class="reference-switcher-dropdown-toggle" aria-expanded="false" aria-haspopup="listbox">';
-        html += '<i class="bi ' + currentMeta.icon + '"></i>';
+        html += iconHtml(currentMeta);
         html += '<span class="reference-switcher-dropdown-label">' + currentMeta.label + '</span>';
         html += '<svg class="reference-switcher-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
         html += '</button>';
@@ -134,7 +154,7 @@
             var selected = id === current ? ' aria-selected="true"' : '';
             var activeClass = id === current ? ' active' : '';
             html += '<li class="reference-switcher-dropdown-item' + activeClass + '" role="option" data-ref="' + id + '"' + selected + '>';
-            html += '<i class="bi ' + meta.icon + '"></i>';
+            html += iconHtml(meta);
             html += '<span>' + meta.label + '</span>';
             html += '</li>';
         }

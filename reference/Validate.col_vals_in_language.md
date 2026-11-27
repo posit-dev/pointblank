@@ -4,7 +4,7 @@ Validate whether text is in the expected language.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L16265-L16461)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L16273-L16469)
 
 ``` python
 Validate.col_vals_in_language(

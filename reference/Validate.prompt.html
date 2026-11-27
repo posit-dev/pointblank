@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-d115e8fe119fec3d8a9be5efe5eb78bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-16c2c2c5529e599bbe6a41763d9257cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -2049,7 +2049,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14429-L14998" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/validate.py#L14429-L15006" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-function">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">Validate</span><span class="op">.</span><span class="fu">prompt</span>(</span>
@@ -2093,7 +2093,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">model</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | list[str]</span></code></dt>
 <dd>
-<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-opus-4-6"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, <code>"azure-openai"</code>, and <code>"cohere"</code>. The model name should be the specific model to be used from the provider (for <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em>). Model names are subject to change so consult the provider’s documentation for the most up-to-date model names. A list of models makes each of them a judge of every row, with their verdicts combined by <code>aggregate=</code> (see the <em>Several Judges</em> section).</p>
+<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-opus-4-6"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, <code>"azure-openai"</code>, <code>"cohere"</code>, and <code>"databricks"</code>. The model name should be the specific model to be used from the provider (for <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em>, and for <code>"databricks"</code>, the name of a serving endpoint). Model names are subject to change so consult the provider’s documentation for the most up-to-date model names. A list of models makes each of them a judge of every row, with their verdicts combined by <code>aggregate=</code> (see the <em>Several Judges</em> section).</p>
 </dd>
 <dt><code><span class="doc-parameter-name">batch_size</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">1000</span></span></code></dt>
 <dd>
@@ -2159,8 +2159,9 @@ The <a href="../reference/Validate.html#pointblank.Validate" class="gdls-link gd
 <li><code>"bedrock"</code> (Amazon Bedrock)</li>
 <li><code>"azure-openai"</code> (Azure OpenAI)</li>
 <li><code>"cohere"</code> (Cohere)</li>
+<li><code>"databricks"</code> (Databricks)</li>
 </ul>
-<p>The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider’s documentation for the most up-to-date model names. For <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em> (the name you assigned when deploying the model in your Azure OpenAI resource), not an OpenAI model id.</p>
+<p>The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider’s documentation for the most up-to-date model names. For <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em> (the name you assigned when deploying the model in your Azure OpenAI resource), not an OpenAI model id. For <code>"databricks"</code>, it’s the name of a Model Serving endpoint in your workspace (e.g., <code>"databricks:databricks-claude-sonnet-4-6"</code>).</p>
 </section>
 <section id="notes-on-authentication" class="level2 doc-notes-on-authentication">
 <h2 class="doc-notes-on-authentication anchored" data-anchor-id="notes-on-authentication">Notes On Authentication</h2>
@@ -2172,12 +2173,13 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <p>There’s no need to have the <code>python-dotenv</code> package installed when using <code>.env</code> files in this way.</p>
 <p><strong>Provider-specific setup</strong>:</p>
 <ul>
-<li><strong>OpenAI</strong>: set <code>OPENAI_API_KEY</code> environment variable or create <code>.env</code> file</li>
+<li><strong>OpenAI</strong>: set <code>OPENAI_API_KEY</code> environment variable or create <code>.env</code> file (to use an OpenAI-compatible server or gateway, also set <code>OPENAI_BASE_URL</code> to its URL, and the requests go to its Chat Completions endpoint)</li>
 <li><strong>Anthropic</strong>: set <code>ANTHROPIC_API_KEY</code> environment variable or create <code>.env</code> file</li>
 <li><strong>Ollama</strong>: no API key required, just ensure Ollama is running locally</li>
 <li><strong>Bedrock</strong>: configure AWS credentials through standard AWS methods</li>
 <li><strong>Azure OpenAI</strong>: set <code>AZURE_OPENAI_API_KEY</code>, <code>AZURE_OPENAI_ENDPOINT</code> (e.g., <code>https://&lt;resource&gt;.openai.azure.com</code>), and <code>OPENAI_API_VERSION</code> (e.g., <code>"2024-06-01"</code>)</li>
 <li><strong>Cohere</strong>: set the <code>CO_API_KEY</code> (or <code>COHERE_API_KEY</code>) environment variable (the requests go to Cohere’s OpenAI-compatible API, so the <code>openai</code> package is needed)</li>
+<li><strong>Databricks</strong>: install the <code>databricks-sdk</code> package (and chatlas 0.13.2 or later); it signs in through the <code>DATABRICKS_HOST</code> and <code>DATABRICKS_TOKEN</code> environment variables, a profile in <code>~/.databrickscfg</code>, or a Databricks notebook’s own credentials</li>
 </ul>
 </section>
 <section id="several-judges" class="level2 doc-several-judges">
@@ -2810,6 +2812,7 @@ OPENAI_API_KEY="your_openai_api_key_here"</code></pre>
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>
+<script src="../sticky-sidebars.js"></script>
 <script src="../sidebar-filter.js"></script>
 <script src="../dark-mode-toggle.js"></script>
 <script src="../back-to-top.js"></script>

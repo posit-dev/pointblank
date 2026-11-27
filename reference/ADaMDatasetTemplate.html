@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-d115e8fe119fec3d8a9be5efe5eb78bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-16c2c2c5529e599bbe6a41763d9257cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -2101,7 +2101,7 @@ The names of the variables that together identify a record. The default is an em
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s look at the template for the Basic Data Structure (BDS), the structure of analysis datasets such as ADVS (vital signs) and ADLB (laboratory results):</p>
-<div id="0951be09" class="cell" data-execution_count="1">
+<div id="0a75fb84" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>bds <span class="op">=</span> pb.get_adam_dataset(<span class="st">"BDS"</span>)</span>
@@ -2116,7 +2116,7 @@ One or more records per subject per analysis parameter per analysis timepoint. U
 </div>
 </div>
 <p>A BDS dataset has a record for each analysis parameter (<code>PARAMCD</code>) at each visit and date, for each subject. The template’s properties list the required and conditionally required variables:</p>
-<div id="b17fd5a8" class="cell" data-execution_count="2">
+<div id="baa10151" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(bds.required_variables)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(bds.conditional_variables)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -2183,7 +2183,7 @@ One or more records per subject per analysis parameter per analysis timepoint. U
 </div>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="e2493418" class="cell" data-execution_count="3">
+<div id="32753767" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>pb.get_adam_dataset(<span class="st">"ADTTE"</span>).required_variables</span></code></pre></div>
@@ -2210,7 +2210,7 @@ One or more records per subject per analysis parameter per analysis timepoint. U
 </div>
 <section id="examples-2" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-2">Examples</h4>
-<div id="704af826" class="cell" data-execution_count="4">
+<div id="aed2337d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>adsl <span class="op">=</span> pb.get_adam_dataset(<span class="st">"ADSL"</span>)</span>
@@ -2243,7 +2243,7 @@ TRTEDT -&gt; Required if treatment end used in derivations</code></pre>
 </div>
 <section id="examples-3" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-3">Examples</h4>
-<div id="cbfcf2d0" class="cell" data-execution_count="5">
+<div id="ed49f9f1" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>pb.get_adam_dataset(<span class="st">"ADSL"</span>).population_flags</span></code></pre></div>
@@ -2310,7 +2310,7 @@ The specification of the variable, or <code>None</code> if the template has no v
 </section>
 <section id="examples-4" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-4">Examples</h4>
-<div id="9362a7f3" class="cell" data-execution_count="6">
+<div id="fae8c907" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>adtte <span class="op">=</span> pb.get_adam_dataset(<span class="st">"ADTTE"</span>)</span>
@@ -2321,7 +2321,7 @@ The specification of the variable, or <code>None</code> if the template has no v
 </div>
 </div>
 <p><code>CNSR</code> is the required censoring indicator of a time-to-event dataset. A name that isn’t in the template gives <code>None</code>:</p>
-<div id="22adb96d" class="cell" data-execution_count="7">
+<div id="1a7e8474" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(adtte.get_variable(<span class="st">"AESEQ"</span>))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>None</code></pre>
@@ -2767,6 +2767,7 @@ The specification of the variable, or <code>None</code> if the template has no v
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>
+<script src="../sticky-sidebars.js"></script>
 <script src="../sidebar-filter.js"></script>
 <script src="../dark-mode-toggle.js"></script>
 <script src="../back-to-top.js"></script>

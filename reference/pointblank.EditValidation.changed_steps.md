@@ -4,7 +4,7 @@ Return a structured, step-level list of the changes between the plans.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L570-L620)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/edit.py#L573-L623)
 
 ``` python
 changed_steps()

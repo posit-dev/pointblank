@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-d115e8fe119fec3d8a9be5efe5eb78bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-16c2c2c5529e599bbe6a41763d9257cb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -2047,7 +2047,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L25-L491" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/posit-dev/pointblank/blob/main/pointblank/draft.py#L25-L507" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-class">
 <div class="sourceCode" id="cb1"><pre class="sourceCode pythonsignature"><code class="sourceCode pythonsignature"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DraftValidation</span>(</span>
@@ -2060,7 +2060,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, <code>"azure-openai"</code>, or <code>"cohere"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code>.</p>
+<p>By using a large language model (LLM) to draft a validation plan, you can quickly generate a starting point for validating a table. This can be useful when you have a new table and you want to get a sense of how to validate it (and adjustments could always be made later). The <a href="../reference/DraftValidation.html#pointblank.DraftValidation" class="gdls-link gdls-code">DraftValidation</a> class uses the <code>chatlas</code> package to draft a validation plan for a given table using an LLM from the <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, <code>"azure-openai"</code>, <code>"cohere"</code>, or <code>"databricks"</code> provider. You can install all requirements for the class through an optional ‘generate’ install of Pointblank via <code>pip install pointblank[generate]</code> (the <code>"databricks"</code> provider also needs the <code>databricks-sdk</code> package).</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -2085,7 +2085,7 @@ Warning
 </dd>
 <dt><code><span class="doc-parameter-name">model</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str</span></code></dt>
 <dd>
-<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-opus-4-6"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, <code>"azure-openai"</code>, and <code>"cohere"</code>. For <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em>, not an OpenAI model id.</p>
+<p>The model to be used. This should be in the form of <code>provider:model</code> (e.g., <code>"anthropic:claude-opus-4-6"</code>). Supported providers are <code>"anthropic"</code>, <code>"openai"</code>, <code>"ollama"</code>, <code>"bedrock"</code>, <code>"azure-openai"</code>, <code>"cohere"</code>, and <code>"databricks"</code>. For <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em>, not an OpenAI model id, and for <code>"databricks"</code> it’s the name of a serving endpoint.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">api_key</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">str | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default">None</span></code></dt>
 <dd>
@@ -2093,7 +2093,7 @@ Warning
 </dd>
 <dt><code><span class="doc-parameter-name">verify_ssl</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">True</span></span></code></dt>
 <dd>
-<p>Whether to verify SSL certificates when making requests to the LLM provider. Set to <code>False</code> to disable SSL verification (e.g., when behind a corporate firewall with self-signed certificates). Defaults to <code>True</code>. Use with caution as disabling SSL verification can pose security risks.</p>
+<p>Whether to verify SSL certificates when making requests to the LLM provider. Set to <code>False</code> to disable SSL verification (e.g., when behind a corporate firewall with self-signed certificates). Defaults to <code>True</code>. Use with caution as disabling SSL verification can pose security risks. This isn’t supported for the <code>"databricks"</code> provider.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">max_reprompts</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">1</span></span></code></dt>
 <dd>
@@ -2127,8 +2127,11 @@ The drafted validation plan.
 <li><code>"bedrock"</code> (Amazon Bedrock)</li>
 <li><code>"azure-openai"</code> (Azure OpenAI)</li>
 <li><code>"cohere"</code> (Cohere)</li>
+<li><code>"databricks"</code> (Databricks)</li>
 </ul>
 <p>The model name should be the specific model to be used from the provider. Model names are subject to change so consult the provider’s documentation for the most up-to-date model names. For <code>"azure-openai"</code>, the value after the colon is the Azure <em>deployment id</em> (the name you assigned when deploying the model in your Azure OpenAI resource). It also requires the environment variables <code>AZURE_OPENAI_API_KEY</code>, <code>AZURE_OPENAI_ENDPOINT</code> (e.g., <code>https://&lt;resource&gt;.openai.azure.com</code>), and <code>OPENAI_API_VERSION</code> (e.g., <code>"2024-06-01"</code>) to be set. For <code>"cohere"</code>, the API key is read from <code>CO_API_KEY</code> (or <code>COHERE_API_KEY</code>) if <code>api_key=</code> isn’t given, and the requests go to Cohere’s OpenAI-compatible API.</p>
+<p>For <code>"databricks"</code>, the value after the colon is the name of a Model Serving endpoint in your workspace (e.g., <code>"databricks:databricks-claude-sonnet-4-6"</code>). It needs the <code>databricks-sdk</code> package (<code>pip install databricks-sdk</code>) and chatlas 0.13.2 or later. The <code>databricks-sdk</code> package handles signing in: through the <code>DATABRICKS_HOST</code> and <code>DATABRICKS_TOKEN</code> environment variables, a profile in <code>~/.databrickscfg</code>, or a Databricks notebook’s own credentials. If <code>api_key=</code> is given, it’s used as a personal access token.</p>
+<p>For <code>"openai"</code>, if the <code>OPENAI_BASE_URL</code> environment variable is set, the requests go to the Chat Completions endpoint at that URL instead of to OpenAI. This is a way to use an OpenAI-compatible server or gateway (such as vLLM or LiteLLM), with <code>OPENAI_API_KEY</code> (or <code>api_key=</code>) as its key.</p>
 </section>
 <section id="notes-on-authentication" class="level2 doc-notes-on-authentication">
 <h2 class="doc-notes-on-authentication anchored" data-anchor-id="notes-on-authentication">Notes On Authentication</h2>
@@ -2703,6 +2706,7 @@ validation
 <script src="../copy-page.js"></script>
 <script src="../sidebar-wrap.js"></script>
 <script src="../sidebar-float.js"></script>
+<script src="../sticky-sidebars.js"></script>
 <script src="../sidebar-filter.js"></script>
 <script src="../dark-mode-toggle.js"></script>
 <script src="../back-to-top.js"></script>
