@@ -939,6 +939,7 @@ def test_default_results_creation():
         ("openai", "openai"),
         ("ollama", "openai"),
         ("azure-openai", "openai"),
+        ("databricks", "openai"),
     ],
 )
 def test_create_chat_instance_missing_provider_package(monkeypatch, provider, package):
@@ -994,6 +995,98 @@ def test_create_chat_instance_openai():
 
     assert isinstance(chat, chatlas.Chat)
     assert chat.provider.name == "OpenAI"
+
+
+def test_create_chat_instance_openai_base_url(monkeypatch):
+    """`OPENAI_BASE_URL` is used for the `openai` provider, and OpenAI's own URL otherwise."""
+    import warnings
+
+    pytest.importorskip("openai")
+    chatlas = pytest.importorskip("chatlas")
+
+    monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
+    chat = _create_chat_instance("openai", "gpt-6-luna", api_key="test-key")
+    assert str(chat.provider._client.base_url) == "https://api.openai.com/v1/"
+
+    # A compatible server gets the Chat Completions API (chatlas warns if it gets the Responses API)
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://gateway.example.com/v1")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        chat = _create_chat_instance("openai", "gpt-6-luna", api_key="test-key")
+    assert str(chat.provider._client.base_url) == "https://gateway.example.com/v1/"
+    assert str(chat.provider._async_client.base_url) == "https://gateway.example.com/v1/"
+    if hasattr(chatlas, "ChatOpenAICompletions"):
+        assert type(chat.provider).__name__ == "OpenAICompletionsProvider"
+
+
+@pytest.fixture
+def fake_databricks_sdk(monkeypatch):
+    """A stand-in `databricks.sdk` (a real `WorkspaceClient` contacts the workspace)."""
+    import types
+
+    workspace_client = Mock(name="WorkspaceClient")
+    sdk = types.ModuleType("databricks.sdk")
+    sdk.WorkspaceClient = workspace_client
+    monkeypatch.setitem(sys.modules, "databricks", types.ModuleType("databricks"))
+    monkeypatch.setitem(sys.modules, "databricks.sdk", sdk)
+    return workspace_client
+
+
+@pytest.mark.parametrize("api_key", [None, "dapi-test"])
+def test_create_chat_instance_databricks(monkeypatch, fake_databricks_sdk, api_key):
+    """The `databricks` provider signs in through the SDK and uses the endpoint as the model."""
+    pytest.importorskip("openai")
+    chatlas = pytest.importorskip("chatlas")
+    monkeypatch.setattr(chatlas, "__version__", "0.13.2")
+
+    sentinel = object()
+    with patch.object(chatlas, "ChatDatabricks", return_value=sentinel) as mock_cls:
+        result = _create_chat_instance(
+            "databricks", "databricks-claude-sonnet-4-6", api_key=api_key, system_prompt="sp"
+        )
+
+    assert result is sentinel
+    # Without `api_key=`, the SDK finds the credentials (env vars, a profile, or a notebook's)
+    if api_key is None:
+        fake_databricks_sdk.assert_called_once_with()
+    else:
+        fake_databricks_sdk.assert_called_once_with(token="dapi-test")
+    mock_cls.assert_called_once_with(
+        model="databricks-claude-sonnet-4-6",
+        system_prompt="sp",
+        workspace_client=fake_databricks_sdk.return_value,
+    )
+
+
+def test_create_chat_instance_databricks_fail_verify_ssl(fake_databricks_sdk):
+    pytest.importorskip("openai")
+    pytest.importorskip("chatlas")
+
+    with pytest.raises(ValueError, match="SSL_CERT_FILE"):
+        _create_chat_instance("databricks", "databricks-claude-sonnet-4-6", verify_ssl=False)
+    fake_databricks_sdk.assert_not_called()
+
+
+def test_create_chat_instance_databricks_fail_old_chatlas(monkeypatch, fake_databricks_sdk):
+    pytest.importorskip("openai")
+    chatlas = pytest.importorskip("chatlas")
+    monkeypatch.setattr(chatlas, "__version__", "0.13.1")
+
+    with pytest.raises(ImportError, match=r"chatlas 0\.13\.2 or later \(chatlas 0\.13\.1 is"):
+        _create_chat_instance("databricks", "databricks-claude-sonnet-4-6")
+    fake_databricks_sdk.assert_not_called()
+
+
+def test_create_chat_instance_databricks_missing_sdk(monkeypatch):
+    """`databricks-sdk` isn't in the `generate` extra, so the error says how to install it."""
+    pytest.importorskip("openai")
+    pytest.importorskip("chatlas")
+    monkeypatch.setitem(sys.modules, "databricks", None)
+    monkeypatch.setitem(sys.modules, "databricks.sdk", None)
+
+    with pytest.raises(ImportError, match=re.escape("`pip install databricks-sdk`")) as e:
+        _create_chat_instance("databricks", "databricks-claude-sonnet-4-6")
+    assert "pointblank[generate]" not in str(e.value)
 
 
 def _anthropic_reply(stop_reason):
