@@ -48,6 +48,7 @@ def assistant(
     - Amazon Bedrock
     - Azure OpenAI
     - Cohere
+    - Databricks
 
     The PbA can be displayed in a browser (the default) or in the terminal. You can choose one or
     the other by setting the `display=` parameter to `"browser"` or `"terminal"`.
@@ -62,7 +63,7 @@ def assistant(
     model
         The model to be used. This should be in the form of `provider:model` (e.g.,
         `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-        `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`.
+        `"ollama"`, `"bedrock"`, `"azure-openai"`, `"cohere"`, and `"databricks"`.
     data
         An optional data table to focus on during discussion with the PbA, which could be a
         DataFrame object, an Ibis table object, a CSV file path, a Parquet file path, or a database
@@ -94,13 +95,18 @@ def assistant(
     - `"bedrock"` (Amazon Bedrock)
     - `"azure-openai"` (Azure OpenAI)
     - `"cohere"` (Cohere)
+    - `"databricks"` (Databricks)
 
     The model name should be the specific model to be used from the provider. Model names are
     subject to change so consult the provider's documentation for the most up-to-date model names.
     For `"azure-openai"`, the value after the colon is the Azure *deployment id*, and the
     `AZURE_OPENAI_ENDPOINT` and `OPENAI_API_VERSION` environment variables must be set. For
     `"cohere"`, the API key is read from `CO_API_KEY` (or `COHERE_API_KEY`) if `api_key=` isn't
-    given.
+    given. For `"databricks"`, the value after the colon is the name of a serving endpoint (e.g.,
+    `"databricks:databricks-claude-sonnet-4-6"`); this needs the `databricks-sdk` package, which
+    signs in with `DATABRICKS_HOST` and `DATABRICKS_TOKEN`, a profile in `~/.databrickscfg`, or a
+    Databricks notebook's own credentials (an `api_key=` is used as a personal access token). For
+    `"openai"`, the requests go to the `OPENAI_BASE_URL` environment variable's URL if it's set.
 
     Notes on Authentication
     -----------------------
@@ -301,15 +307,6 @@ def assistant(
             api_key=api_key,
         )
 
-    elif provider == "openai":  # pragma: no cover
-        from chatlas import ChatOpenAI  # pragma: no cover
-
-        chat = ChatOpenAI(  # pragma: no cover
-            model=model_name,
-            system_prompt=system_prompt,
-            api_key=api_key,
-        )
-
     elif provider == "ollama":  # pragma: no cover
         from chatlas import ChatOllama
 
@@ -326,7 +323,7 @@ def assistant(
             system_prompt=system_prompt,
         )
 
-    elif provider in ("azure-openai", "cohere"):  # pragma: no cover
+    elif provider in ("openai", "azure-openai", "cohere", "databricks"):  # pragma: no cover
         chat = _create_chat_instance(  # pragma: no cover
             provider=provider,
             model_name=model_name,

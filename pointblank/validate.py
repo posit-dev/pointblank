@@ -14492,9 +14492,10 @@ class Validate:
         model
             The model to be used. This should be in the form of `provider:model` (e.g.,
             `"anthropic:claude-opus-4-6"`). Supported providers are `"anthropic"`, `"openai"`,
-            `"ollama"`, `"bedrock"`, `"azure-openai"`, and `"cohere"`. The model name should be the
-            specific model to be used from the provider (for `"azure-openai"`, the value after the
-            colon is the Azure *deployment id*). Model names are subject to change so consult the
+            `"ollama"`, `"bedrock"`, `"azure-openai"`, `"cohere"`, and `"databricks"`. The model
+            name should be the specific model to be used from the provider (for `"azure-openai"`,
+            the value after the colon is the Azure *deployment id*, and for `"databricks"`, the
+            name of a serving endpoint). Model names are subject to change so consult the
             provider's documentation for the most up-to-date model names. A list of models makes
             each of them a judge of every row, with their verdicts combined by `aggregate=` (see
             the *Several Judges* section).
@@ -14564,12 +14565,14 @@ class Validate:
         - `"bedrock"` (Amazon Bedrock)
         - `"azure-openai"` (Azure OpenAI)
         - `"cohere"` (Cohere)
+        - `"databricks"` (Databricks)
 
         The model name should be the specific model to be used from the provider. Model names are
         subject to change so consult the provider's documentation for the most up-to-date model
         names. For `"azure-openai"`, the value after the colon is the Azure *deployment id* (the
         name you assigned when deploying the model in your Azure OpenAI resource), not an OpenAI
-        model id.
+        model id. For `"databricks"`, it's the name of a Model Serving endpoint in your workspace
+        (e.g., `"databricks:databricks-claude-sonnet-4-6"`).
 
         Notes on Authentication
         -----------------------
@@ -14596,7 +14599,9 @@ class Validate:
 
         **Provider-specific setup**:
 
-        - **OpenAI**: set `OPENAI_API_KEY` environment variable or create `.env` file
+        - **OpenAI**: set `OPENAI_API_KEY` environment variable or create `.env` file (to use an
+          OpenAI-compatible server or gateway, also set `OPENAI_BASE_URL` to its URL, and the
+          requests go to its Chat Completions endpoint)
         - **Anthropic**: set `ANTHROPIC_API_KEY` environment variable or create `.env` file
         - **Ollama**: no API key required, just ensure Ollama is running locally
         - **Bedrock**: configure AWS credentials through standard AWS methods
@@ -14604,6 +14609,9 @@ class Validate:
           `https://<resource>.openai.azure.com`), and `OPENAI_API_VERSION` (e.g., `"2024-06-01"`)
         - **Cohere**: set the `CO_API_KEY` (or `COHERE_API_KEY`) environment variable (the requests
           go to Cohere's OpenAI-compatible API, so the `openai` package is needed)
+        - **Databricks**: install the `databricks-sdk` package (and chatlas 0.13.2 or later); it
+          signs in through the `DATABRICKS_HOST` and `DATABRICKS_TOKEN` environment variables, a
+          profile in `~/.databrickscfg`, or a Databricks notebook's own credentials
 
         Several Judges
         --------------

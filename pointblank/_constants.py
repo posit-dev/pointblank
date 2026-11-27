@@ -271,6 +271,7 @@ MODEL_PROVIDERS = [
     "bedrock",
     "azure-openai",
     "cohere",
+    "databricks",
 ]
 
 TABLE_TYPE_STYLES = {
