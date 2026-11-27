@@ -35,7 +35,11 @@ _PROVIDER_PACKAGES = {
     "bedrock": ["anthropic", "boto3"],
     "azure-openai": ["openai"],
     "cohere": ["openai"],
+    "databricks": ["openai", "databricks.sdk"],
 }
+
+# Provider packages that aren't in the `generate` extra, with the names they're installed by
+_PROVIDER_PACKAGES_OUTSIDE_EXTRA = {"databricks.sdk": "databricks-sdk"}
 
 # Cohere's OpenAI-compatible API (its Chat Completions endpoint), used for the `cohere` provider
 _COHERE_BASE_URL = "https://api.cohere.ai/compatibility/v1"
@@ -65,7 +69,18 @@ def _check_ai_package(package: str, needed_for: str) -> None:
 def _check_provider_packages(provider: str) -> None:
     """Check that the packages a model provider needs are installed."""
     for package in _PROVIDER_PACKAGES.get(provider, []):
-        _check_ai_package(package, f"to use the `{provider}` provider")
+        if package not in _PROVIDER_PACKAGES_OUTSIDE_EXTRA:
+            _check_ai_package(package, f"to use the `{provider}` provider")
+            continue
+
+        name = _PROVIDER_PACKAGES_OUTSIDE_EXTRA[package]
+        try:
+            importlib.import_module(package)
+        except ImportError as e:
+            raise ImportError(
+                f"The `{name}` package is required to use the `{provider}` provider. Install it "
+                f"with `pip install {name}`."
+            ) from e
 
 
 def _http_library(sdk: str) -> str:
@@ -192,13 +207,29 @@ def _create_chat_instance(
             kwargs={"http_client": _async_http_client("anthropic", verify_ssl)},
         )
 
-    elif provider == "openai":  # pragma: no cover
-        from chatlas import ChatOpenAI
+    elif provider == "openai":
+        import os
 
-        chat = ChatOpenAI(
+        import chatlas
+
+        # chatlas always gives the OpenAI client a `base_url`, so the client never reads
+        # `OPENAI_BASE_URL` itself. That variable points to an OpenAI-compatible server or gateway,
+        # and those have the Chat Completions endpoint but often not the Responses one (which
+        # `ChatOpenAI` uses in newer versions of chatlas).
+        base_url = os.getenv("OPENAI_BASE_URL")
+        base_url_arg: dict[str, Any]
+        if base_url:
+            chat_class = getattr(chatlas, "ChatOpenAICompletions", chatlas.ChatOpenAI)
+            base_url_arg = {"base_url": base_url}
+        else:
+            chat_class = chatlas.ChatOpenAI
+            base_url_arg = {}
+
+        chat = chat_class(
             model=model_name,
             api_key=api_key,
             system_prompt=system_prompt,
+            **base_url_arg,
             kwargs={"http_client": _async_http_client("openai", verify_ssl)},
         )
 
@@ -271,6 +302,39 @@ def _create_chat_instance(
             base_url=_COHERE_BASE_URL,
             system_prompt=system_prompt,
             kwargs={"http_client": _async_http_client("openai", verify_ssl)},
+        )
+
+    elif provider == "databricks":
+        import chatlas
+
+        # pyrefly: ignore[missing-import]  # optional dependency
+        from databricks.sdk import WorkspaceClient
+
+        # `ChatDatabricks` makes its own HTTP clients, so certificate checks can't be turned off
+        if not verify_ssl:
+            raise ValueError(
+                "`verify_ssl=False` isn't supported for the 'databricks' provider. To trust a "
+                "custom certificate authority, set the `SSL_CERT_FILE` environment variable to "
+                "the path of a certificate bundle that includes it."
+            )
+
+        # Before chatlas 0.13.2, `ChatDatabricks` fails without an `OPENAI_API_KEY` (unused)
+        chatlas_version = tuple(int(part) for part in re.findall(r"\d+", chatlas.__version__)[:3])
+        if chatlas_version < (0, 13, 2):
+            raise ImportError(
+                "The 'databricks' provider needs chatlas 0.13.2 or later (chatlas "
+                f"{chatlas.__version__} is installed). Upgrade it with `pip install -U chatlas`."
+            )
+
+        # The `databricks-sdk` handles sign-in (`DATABRICKS_HOST` and `DATABRICKS_TOKEN`, a
+        # profile in `~/.databrickscfg`, or a notebook's own credentials); an `api_key=` is used
+        # as a personal access token
+        workspace_client = WorkspaceClient(token=api_key) if api_key else WorkspaceClient()
+
+        chat = chatlas.ChatDatabricks(
+            model=model_name,
+            system_prompt=system_prompt,
+            workspace_client=workspace_client,
         )
 
     else:
