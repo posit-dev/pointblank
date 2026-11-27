@@ -137,7 +137,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/pointblank.Pipeline.validate_source.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/pointblank.Pipeline.validate_source.html">
@@ -193,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="41"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -298,7 +297,7 @@ If the data fails the source contract and the contract has <code>on_violation="r
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s make a pipeline that guards the ingestion of sensor readings. The source contract uses <code>on_violation="raise"</code>, so readings that don’t meet it are rejected with an error.</p>
-<div id="ea11ba8b" class="cell" data-execution_count="2">
+<div id="2dd8b90d" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -314,7 +313,7 @@ If the data fails the source contract and the contract has <code>on_violation="r
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>ingest <span class="op">=</span> pb.Pipeline(source<span class="op">=</span>readings_contract, label<span class="op">=</span><span class="st">"Sensor ingest"</span>)</span></code></pre></div>
 </div>
 <p>A batch of good readings passes, and we get the validation back:</p>
-<div id="c65a8e9a" class="cell" data-execution_count="3">
+<div id="a53b23fb" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>readings <span class="op">=</span> pl.DataFrame({<span class="st">"sensor_id"</span>: [<span class="st">"s1"</span>, <span class="st">"s2"</span>, <span class="st">"s3"</span>], <span class="st">"temp_c"</span>: [<span class="fl">21.5</span>, <span class="fl">19.0</span>, <span class="fl">22.1</span>]})</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ingest.validate_source(readings)</span></code></pre></div>
@@ -520,7 +519,7 @@ If the data fails the source contract and the contract has <code>on_violation="r
 </div>
 </div>
 <p>A batch with an impossible temperature raises a <a href="../reference/ContractViolationError.html#pointblank.ContractViolationError" class="gdls-link gdls-code">ContractViolationError</a> (a kind of <code>RuntimeError</code>) naming the contract, so a job that loads the data can stop before anything is written.</p>
-<div id="4876a57b" class="cell" data-execution_count="4">
+<div id="6b22b281" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>bad_readings <span class="op">=</span> pl.DataFrame({<span class="st">"sensor_id"</span>: [<span class="st">"s1"</span>, <span class="st">"s2"</span>], <span class="st">"temp_c"</span>: [<span class="fl">21.5</span>, <span class="fl">85.0</span>]})</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>

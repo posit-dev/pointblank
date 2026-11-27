@@ -117,8 +117,6 @@ result = dev_pipeline.run(
 print(result.get_report())
 ```
 
-    UserWarning: Contract 'raw_customers' (source) violated: validation has failing steps.
-
     Pipeline Boundary Validation Results
     ========================================
 
@@ -135,5 +133,7 @@ print(result.get_report())
       Test units failed: 0
 
     Overall: FAILED
+
+    UserWarning: Contract 'raw_customers' (source) violated: validation has failing steps.
 
 The summary from [`get_report()`](../reference/PipelineResult.md#pointblank.PipelineResult.get_report) shows that the source boundary failed with one failing test unit, while the target boundary passed. Overall, the run failed.

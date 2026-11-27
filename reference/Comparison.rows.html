@@ -137,7 +137,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/Comparison.rows.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/Comparison.rows.html">
@@ -193,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="41"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2105,7 +2104,7 @@ If <code>status=</code> isn’t one of the five row statuses.
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s compare two versions of an employee table, where one salary changed, one employee left, and one joined.</p>
-<div id="31fab4dd" class="cell" data-execution_count="2">
+<div id="ec5bf42a" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2139,7 +2138,7 @@ If <code>status=</code> isn’t one of the five row statuses.
 </div>
 </div>
 <p>Each changed row has both versions of every compared column side by side. Here, <code>dept</code> is the same on both sides and <code>salary</code> is the column that changed. The departed employee is a <code>"missing"</code> row, and it’s shown as it was in the source table:</p>
-<div id="3f92201e" class="cell" data-execution_count="3">
+<div id="d2c14f18" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"missing"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div><style>
@@ -2153,7 +2152,7 @@ If <code>status=</code> isn’t one of the five row statuses.
 </div>
 </div>
 <p>The new employee is an <code>"extra"</code> row, shown as it is in the target table:</p>
-<div id="ae6167b6" class="cell" data-execution_count="4">
+<div id="9f2f661e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>comparison.rows(<span class="st">"extra"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div><style>
@@ -2167,7 +2166,7 @@ If <code>status=</code> isn’t one of the five row statuses.
 </div>
 </div>
 <p>In multiset mode, rows have no identity apart from their values. So <code>"missing"</code> and <code>"extra"</code> rows are listed once each, with the number of times they occur in each table. Here, the target table has one fewer copy of a row than the source:</p>
-<div id="ac566bce" class="cell" data-execution_count="5">
+<div id="80f452ed" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>scans_source <span class="op">=</span> pl.DataFrame({<span class="st">"badge"</span>: [<span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">9</span>], <span class="st">"door"</span>: [<span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>]})</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>scans_target <span class="op">=</span> pl.DataFrame({<span class="st">"badge"</span>: [<span class="dv">7</span>, <span class="dv">9</span>], <span class="st">"door"</span>: [<span class="st">"A"</span>, <span class="st">"B"</span>]})</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>

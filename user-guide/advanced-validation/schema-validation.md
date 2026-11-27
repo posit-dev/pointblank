@@ -443,6 +443,34 @@ validation.get_step_report(i=1)
 | 3 | age | Int64 | 3 | age | ✓ | int | ✓ |
 |  Supplied Column Schema: `[('id', 'int'), ('name', 'str'), ('age', 'int')]` |  |  |  |  |  |  |  |
 
+### Data Type Names Across Backends
+
+Data type names depend on the kind of table. A Polars DataFrame has Polars names (`"String"`, `"Int64"`, `"List(String)"`), while an Ibis table has Ibis names (`"string"`, `"int64"`, `"array<string>"`) whichever backend holds it. So a schema written for an Ibis table on DuckDB while developing locally also works for the same table on PySpark in production. A few Ibis types still differ between backends, such as a timestamp's precision (`"timestamp(6)"` on DuckDB but `"timestamp"` on PySpark), and `full_match_dtypes=False` lets a `"timestamp"` dtype match either one. To accept several names for a column, give the column a list of dtypes:
+
+``` python
+# Accept the Polars name or the Ibis name for each column
+mixed_names_schema = pb.Schema(
+    columns={"id": ["Int64", "int64"], "name": ["String", "string"], "age": ["Int64", "int64"]}
+)
+
+validation = (
+    pb.Validate(data=users_table)
+    .col_schema_match(schema=mixed_names_schema)
+    .interrogate()
+)
+
+validation.get_step_report(i=1)
+```
+
+| Report for Validation Step 1 ✓ COLUMN SCHEMA MATCH COMPLETE IN ORDER COLUMN ≠ column DTYPE ≠ dtype float ≠ float64 |  |  |  |  |  |  |  |
+|----|----|----|----|----|----|----|----|
+| TABLE |  |  | SCHEMA |  |  |  |  |
+|  | COLUMN | DATA TYPE |  | COLUMN |  | DATA TYPE |  |
+| 1 | id | Int64 | 1 | id | ✓ | Int64 \| int64 | ✓ |
+| 2 | name | String | 2 | name | ✓ | String \| string | ✓ |
+| 3 | age | Int64 | 3 | age | ✓ | Int64 \| int64 | ✓ |
+|  Supplied Column Schema: `[('id', ['Int64', 'int64']), ('name', ['String', 'string']), ('age', ['Int64', 'int64'])]` |  |  |  |  |  |  |  |
+
 ## Common Schema Validation Patterns
 
 This section explores common patterns for applying schema validation to different scenarios. Each pattern addresses specific validation needs you might encounter when working with real-world data. We'll examine the step reports ([`Validate.get_step_report()`](../../reference/Validate.get_step_report.md#pointblank.Validate.get_step_report)) for these validations since they provide more detailed information about what was checked and how the validation performed, offering an intuitive way to understand the results beyond simple pass/fail indicators.

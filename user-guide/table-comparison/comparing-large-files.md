@@ -79,11 +79,11 @@ comparison
 
 | Table Comparison |  |
 |----|----|
-| **/tmp/tmp2n875jye/source.csv** (200,000 rows) → **/tmp/tmp2n875jye/target.csv** (199,850 rows), aligned by key `order_id` DIFFERENT 650 of 200,050 rows fail (0.3%) 400 of the 399,600 compared values differ. match **199,400**changed **400**missing **200**extra **50** |  |
+| **/tmp/tmp2nhmb9ol/source.csv** (200,000 rows) → **/tmp/tmp2nhmb9ol/target.csv** (199,850 rows), aligned by key `order_id` DIFFERENT 650 of 200,050 rows fail (0.3%) 400 of the 399,600 compared values differ. match **199,400**changed **400**missing **200**extra **50** |  |
 | Column mismatches (1 of 2 columns) |  |
 | amount | 400 of 199,800 matched rows differ (0.2%) |
 | Changed rows (showing 10 of 400 rows) |  |
-| order_id | /tmp/tmp2n875jye/source…/tmp/tmp2n875jye/target… |
+| order_id | /tmp/tmp2nhmb9ol/source…/tmp/tmp2nhmb9ol/target… |
 | 3 | amount53.62→54.62(+1) |
 | 503 | amount115.89→116.89(+1) |
 | 1003 | amount104.27→105.27(+1) |

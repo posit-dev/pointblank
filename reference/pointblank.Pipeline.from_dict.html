@@ -137,7 +137,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
-<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/pointblank.Pipeline.from_dict.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/pointblank.Pipeline.from_dict.html">
@@ -193,7 +192,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="41"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -294,7 +293,7 @@ If the dictionary has neither a <code>"source"</code> nor a <code>"target"</code
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Here’s a pipeline definition written as JSON. It only has a target contract, so it acts as an output guard.</p>
-<div id="04278e3c" class="cell" data-execution_count="2">
+<div id="4e8c09fa" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
@@ -324,7 +323,7 @@ If the dictionary has neither a <code>"source"</code> nor a <code>"target"</code
 </div>
 </div>
 <p>The target contract didn’t specify a direction, so it was given <code>"target"</code>. The pipeline can now check an export:</p>
-<div id="384ea903" class="cell" data-execution_count="3">
+<div id="60db4aac" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>invoices <span class="op">=</span> pl.DataFrame({<span class="st">"invoice_id"</span>: [<span class="st">"I-1"</span>, <span class="st">"I-2"</span>, <span class="st">"I-3"</span>], <span class="st">"total"</span>: [<span class="fl">120.0</span>, <span class="fl">0.0</span>, <span class="fl">75.5</span>]})</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>export_pipeline.validate_target(invoices)</span></code></pre></div>

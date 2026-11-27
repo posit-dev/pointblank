@@ -1126,6 +1126,15 @@ The table types marked with an asterisk need to be prepared as Ibis tables (with
 requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a Polars or
 Pandas DataFrame, the availability of Ibis is not needed.
 
+An Ibis table's dtypes have Ibis's names (e.g., `"string"`, `"int64"`, `"array<string>"`)
+whichever backend holds the table, so a schema for an Ibis table on one backend (e.g., DuckDB)
+also works with the same table on another (e.g., PySpark). Polars, Pandas and PySpark
+DataFrames have their own dtype names (e.g., `"String"`, `"Int64"`, `"List(String)"`). Ibis
+still gives a few dtypes differently on different backends, such as a timestamp column's
+precision (`"timestamp(6)"` on DuckDB but `"timestamp"` on PySpark); with
+`full_match_dtypes=False` in [`col_schema_match()`](`pointblank.Validate.col_schema_match`), a
+dtype of `"timestamp"` matches both.
+
 ## Additional Notes On Schema Construction {.doc-additional-notes-on-schema-construction}
 
 While there is flexibility in how a schema can be constructed, there is the potential for some
@@ -52817,6 +52826,31 @@ validation = (
         # Allow partial type name matches ---
         full_match_dtypes=False
     )
+    .interrogate()
+)
+
+validation.get_step_report(i=1)
+```
+
+### Data Type Names Across Backends
+
+Data type names depend on the kind of table. A Polars DataFrame has Polars names (`"String"`,
+`"Int64"`, `"List(String)"`), while an Ibis table has Ibis names (`"string"`, `"int64"`,
+`"array<string>"`) whichever backend holds it. So a schema written for an Ibis table on DuckDB
+while developing locally also works for the same table on PySpark in production. A few Ibis
+types still differ between backends, such as a timestamp's precision (`"timestamp(6)"` on DuckDB
+but `"timestamp"` on PySpark), and `full_match_dtypes=False` lets a `"timestamp"` dtype match
+either one. To accept several names for a column, give the column a list of dtypes:
+
+```{python}
+# Accept the Polars name or the Ibis name for each column
+mixed_names_schema = pb.Schema(
+    columns={"id": ["Int64", "int64"], "name": ["String", "string"], "age": ["Int64", "int64"]}
+)
+
+validation = (
+    pb.Validate(data=users_table)
+    .col_schema_match(schema=mixed_names_schema)
     .interrogate()
 )
 

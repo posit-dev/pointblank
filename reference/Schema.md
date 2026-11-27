@@ -4,7 +4,7 @@ Definition of a schema object.
 
 Usage
 
-[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L20-L749)
+[Source](https://github.com/posit-dev/pointblank/blob/main/pointblank/schema.py#L19-L760)
 
 ``` python
 Schema(
@@ -59,6 +59,8 @@ The `tbl=` parameter, if used, can be given any of the following table types:
 - Parquet table (`"parquet"`)\*
 
 The table types marked with an asterisk need to be prepared as Ibis tables (with type of `ibis.expr.types.relations.Table`). Furthermore, using `Schema(tbl=)` with these types of tables requires the Ibis library (`v9.5.0` or above) to be installed. If the input table is a Polars or Pandas DataFrame, the availability of Ibis is not needed.
+
+An Ibis table's dtypes have Ibis's names (e.g., `"string"`, `"int64"`, `"array<string>"`) whichever backend holds the table, so a schema for an Ibis table on one backend (e.g., DuckDB) also works with the same table on another (e.g., PySpark). Polars, Pandas and PySpark DataFrames have their own dtype names (e.g., `"String"`, `"Int64"`, `"List(String)"`). Ibis still gives a few dtypes differently on different backends, such as a timestamp column's precision (`"timestamp(6)"` on DuckDB but `"timestamp"` on PySpark); with `full_match_dtypes=False` in [`col_schema_match()`](../reference/Validate.col_schema_match.md#pointblank.Validate.col_schema_match), a dtype of `"timestamp"` matches both.
 
 ## Additional Notes On Schema Construction
 
