@@ -9,8 +9,8 @@ The [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidat
 When you use [DraftValidation](../../reference/DraftValidation.md#pointblank.DraftValidation), the process works through these steps:
 
 1.  a statistical summary of your data is generated using the [DataScan](../../reference/DataScan.md#pointblank.DataScan) class
-2.  this summary is converted to JSON format and sent to your selected LLM provider
-3.  the LLM uses the summary along with knowledge about Pointblank's validation capabilities to generate a validation plan
+2.  this summary is converted to JSON format and sent to your selected LLM provider, along with any reference files given in `attachments=`
+3.  the LLM uses the summary (and the reference files) along with knowledge about Pointblank's validation capabilities to generate a validation plan
 4.  the result is returned as executable Python code that you can use directly or modify as needed
 
 The entire process happens without sending all of the data to the LLM provider, but only a summary that includes column names, data types, basic statistics, and a small sample of values.
@@ -255,6 +255,28 @@ Notice how the generated plan includes:
 5.  Row and column count validations
 6.  Appropriate handling of missing values with `na_pass=True`
 
+## Drafting from Reference Files
+
+A plan drafted from the data summary alone describes the data as it is now, so it checks that the data stays that way. Often there's also a document saying what the data *should* be: a data dictionary, a schema diagram, a specification, or the configuration of a project. You can give such files (images or PDFs) to `attachments=` and the model will draft the plan from both the summary and the files:
+
+``` python
+pb.DraftValidation(
+    data=pb.load_dataset(dataset="nycflights", tbl_type="duckdb"),
+    model="anthropic:claude-opus-4-6",
+    attachments=["flights_data_dictionary.pdf", "flights_schema.png"]
+)
+```
+
+Each item in `attachments=` can be a local file path, a URL, a `pathlib.Path`, or a chatlas `Content` object, and the supported extensions are `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, and `.pdf`.
+
+Where a reference file gives an expectation, such as a range, a set of allowed values, or a required column, the plan uses it even if the data disagrees, since catching that is the point of the validation. The steps that come from a reference file have a comment saying so (e.g., `# From the data dictionary`), which makes them easy to tell apart when reviewing the plan. The [Schema](../../reference/Schema.md#pointblank.Schema) in the plan still takes its column types from the data summary, since these need to be the table's own type names, but a column that a reference file requires and the table lacks is added to the [Schema](../../reference/Schema.md#pointblank.Schema) by name only, so the schema check will catch it.
+
+There are a few things to keep in mind:
+
+- not every model accepts images and PDFs (many local models through Ollama accept neither), so choose one that does
+- local images are downscaled to 512x512 before they are sent; for a detailed diagram, pass `chatlas.content_image_file(path, resize="high")` instead of the path
+- the files are sent with the first request, and if the plan has to be corrected (see `max_reprompts=`), the retry sends them again as part of the conversation, so large files add to the cost of each retry
+
 ## Working with Model Providers
 
 ### Specifying Models
@@ -296,7 +318,7 @@ A key advantage of [DraftValidation](../../reference/DraftValidation.md#pointbla
 - basic statistics (min, max, mean, median, missing values count)
 - a small sample of values from each column (usually 5-10 values)
 
-This approach protects your data while still providing enough context for the LLM to generate relevant validation rules.
+This approach protects your data while still providing enough context for the LLM to generate relevant validation rules. Files given in `attachments=` are the exception: they are sent to the provider as they are, so don't attach anything the provider shouldn't see.
 
 ## Customizing Generated Plans
 

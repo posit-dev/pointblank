@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-1aa5e9f6d206be91d862d26944677737.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-d115e8fe119fec3d8a9be5efe5eb78bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -138,6 +138,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/user-guide/advanced-validation/schema-validation.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/user-guide/advanced-validation/schema-validation.html">
@@ -193,7 +194,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="41"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -712,7 +713,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <p>Schema validation in Pointblank allows you to verify that your data conforms to an expected structure and type specification. This is particularly useful when ensuring data consistency across systems or validating incoming data against predefined requirements.</p>
 <p>Let’s first look at the dataset we’ll use for the first example:</p>
-<div id="dae22e34" class="cell" data-execution_count="2">
+<div id="f83383ff" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview the small_table dataset we'll use throughout this guide</span></span>
@@ -934,7 +935,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="schema-definition-and-validation" class="level1">
 <h1>Schema Definition and Validation</h1>
 <p>A schema in Pointblank is created using the <a href="../../reference/Schema.html#pointblank.Schema" class="gdls-link gdls-code">Schema</a> class which defines the expected structure of a table. Once created, you apply schema validation through the <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>Validate.col_schema_match()</code></a> validation step.</p>
-<div id="7d84c7cd" class="cell" data-execution_count="3">
+<div id="3ef675b4" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a schema definition matching small_table structure</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
@@ -1315,7 +1316,7 @@ tr { background-color: transparent; }
 </div>
 <p>The output shows the validation passed successfully. When all columns have the correct names and types as specified in the schema, the validation passes with a single passing test unit. If there were discrepancies, this would fail, but the basic output wouldn’t show specific issues.</p>
 <p>For detailed information about validation results, use <a href="../../reference/Validate.get_step_report.html#pointblank.Validate.get_step_report" class="gdls-link"><code>Validate.get_step_report()</code></a>:</p>
-<div id="0ce9fb04" class="cell" data-execution_count="4">
+<div id="cb607422" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>small_table_validation.get_step_report(i<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div id="pb_step_tbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -1533,7 +1534,7 @@ tr { background-color: transparent; }
 <section id="discovering-column-types" class="level1">
 <h1>Discovering Column Types</h1>
 <p>To easily determine the correct type string for columns in your data, Pointblank provides two helpful functions:</p>
-<div id="b1baac85" class="cell" data-execution_count="5">
+<div id="99cc40c1" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1544,7 +1545,7 @@ tr { background-color: transparent; }
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"join_date"</span>: [date(<span class="dv">2020</span>, <span class="dv">1</span>, <span class="dv">1</span>), date(<span class="dv">2021</span>, <span class="dv">3</span>, <span class="dv">15</span>), date(<span class="dv">2022</span>, <span class="dv">7</span>, <span class="dv">10</span>)]</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div>
 </div>
-<div id="83cfb0e2" class="cell" data-execution_count="6">
+<div id="579744d5" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Method 1: Using `preview()` with `show_types=True` to see column types</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pb.preview(sample_df)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -1659,73 +1660,73 @@ tr { background-color: transparent; }
 </div>
 </div>
 </div>
-<div id="b78daf33" class="cell" data-execution_count="7">
+<div id="f473f899" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Method 2: Using `col_summary_tbl()` which shows column types and other details</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>pb.col_summary_tbl(sample_df)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
-<div id="brglwmltsz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="znasfqxput" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-#brglwmltsz table {
+#znasfqxput table {
           font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#brglwmltsz thead, tbody, tfoot, tr, td, th { border-style: none; }
+#znasfqxput thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#brglwmltsz p { margin: 0; padding: 0; }
- #brglwmltsz .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #brglwmltsz .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #brglwmltsz .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #brglwmltsz .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #brglwmltsz .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #brglwmltsz .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #brglwmltsz .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #brglwmltsz .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #brglwmltsz .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #brglwmltsz .gt_column_spanner_outer:first-child { padding-left: 0; }
- #brglwmltsz .gt_column_spanner_outer:last-child { padding-right: 0; }
- #brglwmltsz .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #brglwmltsz .gt_spanner_row { border-bottom-style: hidden; }
- #brglwmltsz .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #brglwmltsz .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #brglwmltsz .gt_from_md> :first-child { margin-top: 0; }
- #brglwmltsz .gt_from_md> :last-child { margin-bottom: 0; }
- #brglwmltsz .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #brglwmltsz .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #brglwmltsz .gt_indent_1 { text-indent: 5px; }
- #brglwmltsz .gt_indent_2 { text-indent: calc(5px * 2); }
- #brglwmltsz .gt_indent_3 { text-indent: calc(5px * 3); }
- #brglwmltsz .gt_indent_4 { text-indent: calc(5px * 4); }
- #brglwmltsz .gt_indent_5 { text-indent: calc(5px * 5); }
- #brglwmltsz .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #brglwmltsz .gt_row_group_first td { border-top-width: 2px; }
- #brglwmltsz .gt_row_group_first th { border-top-width: 2px; }
- #brglwmltsz .gt_striped { color: #333333; background-color: #F4F4F4; }
- #brglwmltsz .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #brglwmltsz .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #brglwmltsz .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
- #brglwmltsz .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #brglwmltsz .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #brglwmltsz .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #brglwmltsz .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #brglwmltsz .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #brglwmltsz .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #brglwmltsz .gt_left { text-align: left; }
- #brglwmltsz .gt_center { text-align: center; }
- #brglwmltsz .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #brglwmltsz .gt_font_normal { font-weight: normal; }
- #brglwmltsz .gt_font_bold { font-weight: bold; }
- #brglwmltsz .gt_font_italic { font-style: italic; }
- #brglwmltsz .gt_super { font-size: 65%; }
- #brglwmltsz .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #brglwmltsz .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
- #brglwmltsz .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #brglwmltsz .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #brglwmltsz .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #brglwmltsz .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#znasfqxput p { margin: 0; padding: 0; }
+ #znasfqxput .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #znasfqxput .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #znasfqxput .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #znasfqxput .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #znasfqxput .gt_heading { background-color: #FFFFFF; text-align: left; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #znasfqxput .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #znasfqxput .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #znasfqxput .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #znasfqxput .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #znasfqxput .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #znasfqxput .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #znasfqxput .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #znasfqxput .gt_spanner_row { border-bottom-style: hidden; }
+ #znasfqxput .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #znasfqxput .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #znasfqxput .gt_from_md> :first-child { margin-top: 0; }
+ #znasfqxput .gt_from_md> :last-child { margin-bottom: 0; }
+ #znasfqxput .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #znasfqxput .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #znasfqxput .gt_indent_1 { text-indent: 5px; }
+ #znasfqxput .gt_indent_2 { text-indent: calc(5px * 2); }
+ #znasfqxput .gt_indent_3 { text-indent: calc(5px * 3); }
+ #znasfqxput .gt_indent_4 { text-indent: calc(5px * 4); }
+ #znasfqxput .gt_indent_5 { text-indent: calc(5px * 5); }
+ #znasfqxput .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #znasfqxput .gt_row_group_first td { border-top-width: 2px; }
+ #znasfqxput .gt_row_group_first th { border-top-width: 2px; }
+ #znasfqxput .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #znasfqxput .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #znasfqxput .gt_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #znasfqxput .gt_first_summary_row { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; }
+ #znasfqxput .gt_last_summary_row_top { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #znasfqxput .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #znasfqxput .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #znasfqxput .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #znasfqxput .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #znasfqxput .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #znasfqxput .gt_left { text-align: left; }
+ #znasfqxput .gt_center { text-align: center; }
+ #znasfqxput .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #znasfqxput .gt_font_normal { font-weight: normal; }
+ #znasfqxput .gt_font_bold { font-weight: bold; }
+ #znasfqxput .gt_font_italic { font-style: italic; }
+ #znasfqxput .gt_super { font-size: 65%; }
+ #znasfqxput .gt_footnotes { color: font-color(#FFFFFF); background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #znasfqxput .gt_footnote { margin: 0px; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; }
+ #znasfqxput .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #znasfqxput .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #znasfqxput .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #znasfqxput .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 <table style="table-layout: fixed;; width: 0px" class="gt_table" aria-labelledby="title" data-quarto-disable-processing="true" data-quarto-bootstrap="false">
@@ -1862,7 +1863,7 @@ tr { background-color: transparent; }
 <section id="using-a-list-of-tuples-with-columns" class="level2">
 <h2 class="anchored" data-anchor-id="using-a-list-of-tuples-with-columns">1. Using a List of Tuples with <code>columns=</code></h2>
 <p>This approach allows for mixed validation: some columns checked for both name and type, others only for name:</p>
-<div id="bf5fb67b" class="cell" data-execution_count="8">
+<div id="39252c0e" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>schema_tuples <span class="op">=</span> pb.Schema(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># List of tuples approach: flexible for mixed type/name checking ---</span></span>
@@ -1886,7 +1887,7 @@ tr { background-color: transparent; }
 <section id="using-a-dictionary-with-columns" class="level2">
 <h2 class="anchored" data-anchor-id="using-a-dictionary-with-columns">2. Using a Dictionary with <code>columns=</code></h2>
 <p>This approach is often the most readable when defining a schema manually, especially for larger schemas:</p>
-<div id="a5bce4c9" class="cell" data-execution_count="9">
+<div id="5d6ab8eb" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>schema_dict <span class="op">=</span> pb.Schema(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Dictionary approach (keys are column names, values are data types) ---</span></span>
@@ -1912,7 +1913,7 @@ tr { background-color: transparent; }
 <section id="using-keyword-arguments" class="level2">
 <h2 class="anchored" data-anchor-id="using-keyword-arguments">3. Using Keyword Arguments</h2>
 <p>For more readable code with a small number of columns:</p>
-<div id="596f0f28" class="cell" data-execution_count="10">
+<div id="89470290" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>schema_kwargs <span class="op">=</span> pb.Schema(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Keyword arguments approach (more readable for simple schemas) ---</span></span>
@@ -1934,7 +1935,7 @@ tr { background-color: transparent; }
 <section id="extracting-from-an-existing-table-with-tbl" class="level2">
 <h2 class="anchored" data-anchor-id="extracting-from-an-existing-table-with-tbl">4. Extracting from an Existing Table with <code>tbl=</code></h2>
 <p>You can automatically extract a schema from an existing table:</p>
-<div id="1903b7a2" class="cell" data-execution_count="11">
+<div id="90280e34" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> polars <span class="im">as</span> pl</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample dataframe</span></span>
@@ -1961,7 +1962,7 @@ tr { background-color: transparent; }
 <section id="multiple-data-types-for-a-column" class="level1">
 <h1>Multiple Data Types for a Column</h1>
 <p>You can specify multiple acceptable types for a column by providing a list of types:</p>
-<div id="b1b7e67d" class="cell" data-execution_count="12">
+<div id="ebf3b7b2" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Schema with multiple possible types for a column</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>schema_multi_types <span class="op">=</span> pb.Schema(</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>
@@ -2023,7 +2024,7 @@ tr { background-color: transparent; }
 <section id="controlling-column-presence" class="level2">
 <h2 class="anchored" data-anchor-id="controlling-column-presence">Controlling Column Presence</h2>
 <p>By default, <a href="../../reference/Validate.col_schema_match.html#pointblank.Validate.col_schema_match" class="gdls-link"><code>Validate.col_schema_match()</code></a> requires a complete match between the schema’s columns and the table’s columns. You can make this more flexible:</p>
-<div id="2f8af52b" class="cell" data-execution_count="13">
+<div id="1f6f2417" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample table</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>users_table_extra <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
@@ -2204,7 +2205,7 @@ tr { background-color: transparent; }
 <section id="column-order-enforcement" class="level2">
 <h2 class="anchored" data-anchor-id="column-order-enforcement">Column Order Enforcement</h2>
 <p>You can control whether column order matters in your validation:</p>
-<div id="7e1658d6" class="cell" data-execution_count="14">
+<div id="f0121458" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a sample table</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>users_table <span class="op">=</span> pl.DataFrame({</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"id"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>],</span>
@@ -2374,7 +2375,7 @@ tr { background-color: transparent; }
 <section id="case-sensitivity" class="level2">
 <h2 class="anchored" data-anchor-id="case-sensitivity">Case Sensitivity</h2>
 <p>Control whether column names and data types are case-sensitive:</p>
-<div id="6fd0cd4c" class="cell" data-execution_count="15">
+<div id="45098c79" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create schema with different case charactistics</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>case_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{<span class="st">"ID"</span>: <span class="st">"int64"</span>, <span class="st">"NAME"</span>: <span class="st">"string"</span>, <span class="st">"AGE"</span>: <span class="st">"int64"</span>}</span>
@@ -2540,7 +2541,7 @@ tr { background-color: transparent; }
 <section id="type-matching-precision" class="level2">
 <h2 class="anchored" data-anchor-id="type-matching-precision">Type Matching Precision</h2>
 <p>Control how strictly data types must match:</p>
-<div id="8ab870e3" class="cell" data-execution_count="16">
+<div id="05615225" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create schema with simplified type names</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>type_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2708,7 +2709,7 @@ tr { background-color: transparent; }
 <section id="data-type-names-across-backends" class="level2">
 <h2 class="anchored" data-anchor-id="data-type-names-across-backends">Data Type Names Across Backends</h2>
 <p>Data type names depend on the kind of table. A Polars DataFrame has Polars names (<code>"String"</code>, <code>"Int64"</code>, <code>"List(String)"</code>), while an Ibis table has Ibis names (<code>"string"</code>, <code>"int64"</code>, <code>"array&lt;string&gt;"</code>) whichever backend holds it. So a schema written for an Ibis table on DuckDB while developing locally also works for the same table on PySpark in production. A few Ibis types still differ between backends, such as a timestamp’s precision (<code>"timestamp(6)"</code> on DuckDB but <code>"timestamp"</code> on PySpark), and <code>full_match_dtypes=False</code> lets a <code>"timestamp"</code> dtype match either one. To accept several names for a column, give the column a list of dtypes:</p>
-<div id="3f5d8079" class="cell" data-execution_count="17">
+<div id="5062dfd1" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Accept the Polars name or the Ibis name for each column</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>mixed_names_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{<span class="st">"id"</span>: [<span class="st">"Int64"</span>, <span class="st">"int64"</span>], <span class="st">"name"</span>: [<span class="st">"String"</span>, <span class="st">"string"</span>], <span class="st">"age"</span>: [<span class="st">"Int64"</span>, <span class="st">"int64"</span>]}</span>
@@ -2869,7 +2870,7 @@ tr { background-color: transparent; }
 <section id="structural-validation-only" class="level2">
 <h2 class="anchored" data-anchor-id="structural-validation-only">Structural Validation Only</h2>
 <p>When you only care about column names but not their types:</p>
-<div id="e20c0221" class="cell" data-execution_count="18">
+<div id="a7b2d5f0" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a schema with only column names</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>structure_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"id"</span>, <span class="st">"name"</span>, <span class="st">"age"</span>, <span class="st">"extra_col"</span>]</span>
@@ -3037,7 +3038,7 @@ tr { background-color: transparent; }
 <section id="mixed-validation" class="level2">
 <h2 class="anchored" data-anchor-id="mixed-validation">Mixed Validation</h2>
 <p>Validate types for critical columns but just presence for others:</p>
-<div id="b1863ac5" class="cell" data-execution_count="19">
+<div id="fa868de5" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mixed validation for different columns</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>mixed_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
@@ -3210,7 +3211,7 @@ tr { background-color: transparent; }
 <section id="progressive-schema-evolution" class="level2">
 <h2 class="anchored" data-anchor-id="progressive-schema-evolution">Progressive Schema Evolution</h2>
 <p>As your data evolves, you might need to adapt your validation approach:</p>
-<div id="76f3cc84" class="cell" data-execution_count="20">
+<div id="228d5715" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Original schema</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>original_schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>
@@ -3398,7 +3399,7 @@ tr { background-color: transparent; }
 <section id="integrating-with-larger-validation-workflows" class="level1">
 <h1>Integrating with Larger Validation Workflows</h1>
 <p>Schema validation is often just one part of a comprehensive data validation strategy. You can combine schema checks with other validation steps:</p>
-<div id="e6a66626" class="cell" data-execution_count="21">
+<div id="c6d19002" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a schema</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>schema <span class="op">=</span> pb.Schema(</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>{</span>

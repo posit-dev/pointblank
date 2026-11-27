@@ -87,7 +87,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-1aa5e9f6d206be91d862d26944677737.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-d115e8fe119fec3d8a9be5efe5eb78bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -134,6 +134,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.setAttribute('data-gd-ref-sections','api,cli,mcp');});</script>
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js"></script>
 <meta name="gd-scale-to-fit" data-selectors="[&quot;#pb_tbl&quot;]">
+<meta name="gd-logo-tooltip" content="<code>v1.3.0</code><br>Released 2026-11-12">
 <style>:root{--gd-nav-prefix-api:"API";--gd-nav-prefix-cli:"CLI";--gd-nav-prefix-mcp:"MCP";}</style>
 <link rel="canonical" href="https://posit-dev.github.io/pointblank/reference/VariableMetadata.html">
 <meta property="og:url" content="https://posit-dev.github.io/pointblank/reference/VariableMetadata.html">
@@ -189,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
     <a class="nav-link" href="https://github.com/posit-dev/pointblank"> 
-<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank"></span></span></a>
+<span class="menu-text"><span id="repository-widget" data-provider="github" data-label="GitHub" data-url="https://github.com/posit-dev/pointblank" data-issues-url="https://github.com/posit-dev/pointblank/issues" data-requests-url="https://github.com/posit-dev/pointblank/pulls" data-releases-url="https://github.com/posit-dev/pointblank/releases" data-fork-url="https://github.com/posit-dev/pointblank/fork" data-public-api="https://api.github.com/repos/posit-dev/pointblank" data-stars="505" data-forks="41"></span></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -2205,7 +2206,7 @@ The system of units, such as <code>"SI"</code>. The default is <code>None</code>
 <section id="examples" class="level2 doc-examples">
 <h2 class="doc-examples anchored" data-anchor-id="examples">Examples</h2>
 <p>Let’s look up a variable in the bundled Frictionless Data Package with <a href="../reference/pointblank.MetadataImport.get_variable.html" class="gdls-link"><code>get_variable()</code></a>:</p>
-<div id="942e9726" class="cell" data-execution_count="1">
+<div id="9e4cd0be" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>meta <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"datapackage.json"</span>))</span>
@@ -2219,7 +2220,7 @@ The system of units, such as <code>"SI"</code>. The default is <code>None</code>
 </div>
 </div>
 <p>The <code>transaction_id</code> field is a required and unique string of 5 to 20 characters, and the package declares <code>"NA"</code> and <code>"N/A"</code> as its missing-value markers. The CDISC fields are filled in for variables read from a Define-XML document:</p>
-<div id="d87f3b51" class="cell" data-execution_count="2">
+<div id="207c43d1" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dm <span class="op">=</span> pb.import_metadata(pb.load_metadata_example(<span class="st">"define.xml"</span>), dataset<span class="op">=</span><span class="st">"DM"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sex <span class="op">=</span> dm.get_variable(<span class="st">"SEX"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2233,7 +2234,7 @@ DM Record Qualifier
 </div>
 </div>
 <p>The <code>SEX</code> variable uses the <code>Sex</code> codelist, whose values were copied into <code>allowed_values</code>. <a href="../reference/VariableMetadata.html#pointblank.VariableMetadata" class="gdls-link gdls-code">VariableMetadata</a> objects can also be created directly, which is how a <a href="../reference/MetadataImport.html#pointblank.MetadataImport" class="gdls-link"><code>MetadataImport</code></a> can be built for data that doesn’t come with a metadata file:</p>
-<div id="d1a95bbe" class="cell" data-execution_count="3">
+<div id="53b3ccc3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pb.VariableMetadata(name<span class="op">=</span><span class="st">"age"</span>, label<span class="op">=</span><span class="st">"Age in years"</span>, dtype<span class="op">=</span><span class="st">"Int64"</span>, min_val<span class="op">=</span><span class="dv">18</span>, max_val<span class="op">=</span><span class="dv">99</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>VariableMetadata(name='age', label='Age in years', description=None, dtype='Int64', role=None, required=False, unique=False, min_val=18, max_val=99, min_length=None, max_length=None, pattern=None, allowed_values=None, codelist_ref=None, display_format=None, value_labels=None, missing_values=None, missing_value_labels=None, origin=None, computational_method=None, controlled_term=None, significant_digits=None, cdisc_domain=None, cdisc_role=None, adam_derivation=None, traceability_ref=None, unit=None, unit_system=None)</code></pre>
@@ -2301,7 +2302,7 @@ A <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-lin
 </section>
 <section id="examples-1" class="level4 doc-examples">
 <h4 class="doc-examples anchored" data-anchor-id="examples-1">Examples</h4>
-<div id="321b299a" class="cell" data-execution_count="4">
+<div id="4275122d" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pointblank <span class="im">as</span> pb</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>income <span class="op">=</span> pb.VariableMetadata(</span>
@@ -2317,7 +2318,7 @@ A <a href="../reference/MissingSpec.html#pointblank.MissingSpec" class="gdls-lin
 </div>
 </div>
 <p>The two labels became the reasons <code>"not_asked"</code> and <code>"refused"</code>. The spec can be given to the <code>missing=</code> parameter of a validation method so that these codes are reported as missing data rather than as failing values. For a variable without missing values the method returns <code>None</code>:</p>
-<div id="0d019a4b" class="cell" data-execution_count="5">
+<div id="cf62b3d4" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pb.VariableMetadata(name<span class="op">=</span><span class="st">"age"</span>, dtype<span class="op">=</span><span class="st">"Int64"</span>).to_missing_spec())</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>None</code></pre>
