@@ -337,9 +337,13 @@ class DraftValidation:
 
         # Create the chat client (shared provider abstraction, same one used by EditValidation)
         # and generate the plan, applying a syntax/lint guardrail with an automatic re-prompt.
-        self._generate(provider=provider, model_name=model_name, prompt=prompt)
+        self._generate(
+            provider=provider, model_name=model_name, prompt=prompt, attachments=attachments
+        )
 
-    def _generate(self, provider: str, model_name: str, prompt: str) -> None:
+    def _generate(
+        self, provider: str, model_name: str, prompt: str, attachments: list[Any]
+    ) -> None:
         chat = _create_chat_instance(
             provider=provider,
             model_name=model_name,
@@ -348,7 +352,9 @@ class DraftValidation:
             system_prompt="You are a terse assistant and a Python expert.",
         )
 
-        response = _chat_reply(chat, prompt)
+        # The attachments go with the first message only; a re-prompt continues the same chat, so
+        # the model still has them
+        response = _chat_reply(chat, prompt, *attachments)
         code = _extract_code(response)
 
         # Syntax/lint guardrail: re-prompt on failure up to `max_reprompts` times
