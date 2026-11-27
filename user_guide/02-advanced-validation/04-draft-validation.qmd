@@ -52,6 +52,7 @@ The `DraftValidation` class supports multiple LLM providers:
 - **Amazon Bedrock** (AWS-hosted models)
 - **Azure OpenAI** (OpenAI models deployed on Azure)
 - **Cohere** (Command models, through Cohere's OpenAI-compatible API)
+- **Databricks** (models served from a Databricks workspace; needs `pip install databricks-sdk`)
 
 Each provider has different capabilities and performance characteristics, but all can be used to
 generate validation plans through a consistent interface.
@@ -182,6 +183,10 @@ OPENAI_API_VERSION=2025-03-01-preview
 
 # For Cohere:
 CO_API_KEY=your_cohere_api_key_here
+
+# For Databricks (or use a profile in ~/.databrickscfg):
+DATABRICKS_HOST=https://your-workspace.cloud.databricks.com
+DATABRICKS_TOKEN=your_databricks_personal_access_token_here
 ```
 
 If your API keys have standard names (like `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`),
@@ -336,6 +341,32 @@ pb.DraftValidation(data=data, model="azure-openai:my-gpt4-deployment")
 
 # Using Cohere (requires the CO_API_KEY env var)
 pb.DraftValidation(data=data, model="cohere:command-a-03-2025")
+
+# Using a Databricks serving endpoint (the value after the colon is the endpoint name)
+pb.DraftValidation(data=data, model="databricks:databricks-claude-sonnet-4-6")
+```
+
+### Databricks and OpenAI-Compatible Servers
+
+The `databricks` provider sends requests to a Model Serving endpoint in your Databricks workspace.
+It needs chatlas 0.13.2 or later and the `databricks-sdk` package (`pip install databricks-sdk`),
+which takes care of signing in: with the `DATABRICKS_HOST` and `DATABRICKS_TOKEN` environment variables, with a profile in
+`~/.databrickscfg`, or (in a Databricks notebook) with the notebook's own credentials. If you pass
+`api_key=`, it's used as a personal access token. The `verify_ssl=False` option isn't available for
+this provider, but you can point the `SSL_CERT_FILE` environment variable to a certificate bundle
+if your network needs a custom certificate authority.
+
+For other servers and gateways with an OpenAI-compatible API (such as vLLM or LiteLLM), use the
+`openai` provider and set the `OPENAI_BASE_URL` environment variable to the server's URL. The
+requests then go to that server's Chat Completions endpoint, with `OPENAI_API_KEY` (or `api_key=`)
+as the key:
+
+```python
+import os
+
+os.environ["OPENAI_BASE_URL"] = "https://llm-gateway.example.com/v1"
+
+pb.DraftValidation(data=data, model="openai:my-gateway-model")
 ```
 
 ### Model Performance and Privacy
