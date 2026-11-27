@@ -13,6 +13,7 @@ from pointblank._utils_ai import (
     _create_chat_instance,
     _extract_chain_steps,
     _extract_code,
+    _prepare_attachments,
 )
 from pointblank.datascan import DataScan
 
@@ -63,6 +64,14 @@ class DraftValidation:
         retry is another request to the provider, so a higher value can cost more. Set to `0` to
         accept the first reply as is, and check it yourself with the object's `validate_syntax()`
         method. Defaults to `1`.
+    attachments
+        An optional list of reference files (images or PDFs) describing what the table should
+        contain, such as a data dictionary, a schema diagram, or a specification. Each item can be a
+        local file path, a URL (`http://` / `https://`), a `pathlib.Path`, or a pre-built chatlas
+        `Content` object. Supported extensions are `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, and
+        `.pdf`. The model uses the expectations it finds in them (ranges, allowed values, required
+        columns, etc.) in the drafted plan, even where the table's summary disagrees. See the
+        *Drafting from Reference Files* section for more.
 
     Returns
     -------
@@ -155,10 +164,38 @@ class DraftValidation:
     validation plan. As such, even very large tables can be used with the `DraftValidation` class
     since the contents of the table are not sent to the model provider.
 
+    Files given in `attachments=` are different: they are sent to the model provider as they are
+    (local images are first downscaled to 512x512), so don't attach anything that the provider
+    shouldn't see.
+
     The Amazon Bedrock is a special case since it is a self-hosted model and security controls are
     in place to ensure that data is kept within the user's AWS environment. If using an Ollama
     model all data is handled locally, though only a few models are capable enough to perform the
     task of drafting a validation plan.
+
+    Drafting from Reference Files
+    -----------------------------
+    The table's summary only says what the data *is*, so a plan drafted from it alone checks that
+    the data stays the way it is now. If there's a document saying what the data *should be* (a
+    data dictionary, a schema diagram, a specification, or the configuration of a project), it can
+    be given to `attachments=`, and the model will draft the plan from both. Where a reference file
+    gives an expectation, such as a range, a set of allowed values, or a required column, the plan
+    uses it even if the data disagrees, since catching that is the point of the validation. Each
+    step that comes from a reference file gets a comment saying so.
+
+    A few things to keep in mind when using reference files:
+
+    - the `Schema` in the plan still takes its column types from the table's summary (they need to
+      be the table's own type names), and a different type in a reference file is noted in a
+      comment; a column that a reference file requires but the table lacks is added to the `Schema`
+      by name only, so the schema check fails
+    - not every model accepts images and PDFs (many local models through Ollama accept neither),
+      so choose one that does
+    - local images given as paths are downscaled to 512x512 (chatlas's `resize="low"`); for a
+      detailed diagram, pass `chatlas.content_image_file(path, resize="high")` instead
+    - the files are sent with the first request; if the plan has to be corrected (see
+      `max_reprompts=`), the retry sends them again as part of the conversation, so large files
+      add to the cost of each retry
 
     Examples
     --------
@@ -245,6 +282,22 @@ class DraftValidation:
     Note that the output does not know how the data was obtained, so it uses the placeholder
     `your_data` in the `data=` argument of the `Validate` class. When adapted for use, this should
     be replaced with the actual data variable.
+
+    If there is a document describing what the table should contain, it can be attached so that
+    the plan checks the data against it. Here, a data dictionary for the flights data (a PDF) and a
+    diagram of its schema (an image) are given to `attachments=`:
+
+    ```python
+    pb.DraftValidation(
+        data=data,
+        model="anthropic:claude-opus-4-6",
+        attachments=["flights_data_dictionary.pdf", "flights_schema.png"]
+    )
+    ```
+
+    The drafted plan has the same parts as before, but its steps also use the expectations in the
+    two files (e.g., the allowed values of `carrier` or the range of `distance`), with a comment on
+    each step that comes from them.
     """
 
     data: Any
@@ -252,12 +305,17 @@ class DraftValidation:
     api_key: str | None = None
     verify_ssl: bool = True
     max_reprompts: int = 1
+    attachments: list | None = None
     response: str = field(init=False)
     code: str = field(init=False)
 
     def __post_init__(self) -> None:
         # Check that the chatlas package is installed
         _check_ai_package("chatlas", "to use the `DraftValidation` class")
+
+        # Turn `attachments=` into chatlas Content objects, failing on an unsupported file type
+        # before the table is summarized
+        attachments = _prepare_attachments(self.attachments)
 
         # Generate a table summary in JSON format using the `DataScan` class
         tbl_json = DataScan(data=self.data).to_json()
@@ -280,6 +338,33 @@ class DraftValidation:
         with files("pointblank.data").joinpath("api-docs.txt").open(encoding="utf-8") as f:
             api_and_examples_text = f.read()
 
+        # Reference files describe what the table *should* contain, so their expectations take
+        # precedence over what the summary says the table *does* contain
+        if attachments:
+            attachments_text = (
+                " "
+                "Reference files (images or PDFs) are attached to this message. They describe what "
+                "the table should contain (e.g., a data dictionary, a schema diagram, or a "
+                "specification). Additional notes for using them:"
+                " "
+                "  - when an attachment gives an expectation for the data (a range, a set of "
+                "    allowed values, a required column, a key, a format), use it in the plan, even "
+                "    if the JSON summary disagrees, since the plan is meant to catch data that "
+                "    doesn't meet the expectations; for anything the attachments don't cover, use "
+                "    the JSON summary as described below"
+                "  - add a short comment to the right of each step that comes from an attachment "
+                "    (e.g., # From the data dictionary)"
+                "  - in the `Schema`, still take each column type exactly from the JSON summary "
+                "    (they are the table's own type names); if an attachment gives a different "
+                "    type, say so in a comment on that line"
+                "  - if an attachment requires a column that isn't in the JSON summary, add it to "
+                "    the `Schema` as a name-only tuple (e.g., `('column_name',)`) with a comment, "
+                "    and don't use it in any other step"
+                " "
+            )
+        else:
+            attachments_text = ""
+
         prompt = (
             f"{api_and_examples_text}"
             "--------------------------"
@@ -291,6 +376,7 @@ class DraftValidation:
             f"{tbl_json}"
             "```"
             " "
+            f"{attachments_text}"
             "Provide a single piece of Python code for a validation plan that is contained in "
             "```python + ``` code fences. Don't provide any text before or after this block. Use "
             "the same style as in the provided examples."
@@ -337,9 +423,13 @@ class DraftValidation:
 
         # Create the chat client (shared provider abstraction, same one used by EditValidation)
         # and generate the plan, applying a syntax/lint guardrail with an automatic re-prompt.
-        self._generate(provider=provider, model_name=model_name, prompt=prompt)
+        self._generate(
+            provider=provider, model_name=model_name, prompt=prompt, attachments=attachments
+        )
 
-    def _generate(self, provider: str, model_name: str, prompt: str) -> None:
+    def _generate(
+        self, provider: str, model_name: str, prompt: str, attachments: list[Any]
+    ) -> None:
         chat = _create_chat_instance(
             provider=provider,
             model_name=model_name,
@@ -348,7 +438,9 @@ class DraftValidation:
             system_prompt="You are a terse assistant and a Python expert.",
         )
 
-        response = _chat_reply(chat, prompt)
+        # The attachments go with the first message only; a re-prompt continues the same chat, so
+        # the model still has them
+        response = _chat_reply(chat, prompt, *attachments)
         code = _extract_code(response)
 
         # Syntax/lint guardrail: re-prompt on failure up to `max_reprompts` times

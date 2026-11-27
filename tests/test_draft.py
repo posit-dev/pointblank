@@ -13,9 +13,11 @@ class _FakeChat:
     def __init__(self, responses):
         self._responses = list(responses)
         self.prompts = []
+        self.attachments = []
 
-    def chat(self, prompt, stream=False, echo="none"):
+    def chat(self, prompt, *attachments, stream=False, echo="none"):
         self.prompts.append(prompt)
+        self.attachments.append(list(attachments))
         if len(self._responses) > 1:
             return self._responses.pop(0)
         return self._responses[0]
@@ -75,6 +77,65 @@ def test_draft_raises_when_the_reply_is_cut_off():
             DraftValidation(data=small_table, model="anthropic:claude-sonnet-5-5")
 
     assert len(fake.prompts) == 1
+
+
+def test_draft_sends_attachments_with_the_first_message(tmp_path):
+    chatlas = pytest.importorskip("chatlas")
+    small_table = load_dataset(dataset="small_table")
+    pdf = tmp_path / "dictionary.pdf"
+    pdf.write_bytes(b"%PDF-1.4\n%%EOF\n")
+    image = chatlas.content_image_url("https://example.com/schema.png")
+
+    bad = "```python\nvalidation = pb.Validate(data=your_data).col_vals_bogus(columns='a')\n```"
+    fake = _FakeChat([bad, _DRAFT])
+    with patch("pointblank.draft._create_chat_instance", return_value=fake):
+        draft = DraftValidation(
+            data=small_table, model="anthropic:claude-opus-4-8", attachments=[pdf, image]
+        )
+
+    assert draft.validate_syntax()
+
+    # A path is turned into chatlas content, and a Content object is sent as it is
+    first = fake.attachments[0]
+    assert [type(x).__name__ for x in first] == ["ContentPDF", "ContentImageRemote"]
+    assert first[1] is image
+
+    # The prompt says how to use them; the re-prompt continues the chat without them
+    assert "Reference files (images or PDFs) are attached" in fake.prompts[0]
+    assert "# From the data dictionary" in fake.prompts[0]
+    assert fake.attachments[1] == []
+
+
+def test_draft_without_attachments_sends_only_the_prompt():
+    pytest.importorskip("chatlas")
+    small_table = load_dataset(dataset="small_table")
+    fake = _FakeChat([_DRAFT])
+    with patch("pointblank.draft._create_chat_instance", return_value=fake):
+        DraftValidation(data=small_table, model="anthropic:claude-opus-4-8", attachments=[])
+
+    assert fake.attachments == [[]]
+    assert "Reference files" not in fake.prompts[0]
+
+
+@pytest.mark.parametrize(
+    "attachments, error, message",
+    [
+        (["notes.docx"], ValueError, "Unsupported attachment extension"),
+        ("schema.png", TypeError, "must be a list or tuple"),
+    ],
+)
+def test_draft_fail_bad_attachments(attachments, error, message):
+    # Raised before the table is summarized or the model is called
+    pytest.importorskip("chatlas")
+    with (
+        patch("pointblank.draft.DataScan") as scan,
+        patch("pointblank.draft._create_chat_instance") as create_chat,
+    ):
+        with pytest.raises(error, match=message):
+            DraftValidation(data="data", model="anthropic:claude-opus-4-8", attachments=attachments)
+
+    scan.assert_not_called()
+    create_chat.assert_not_called()
 
 
 def test_draft_fail_no_chatlas():
