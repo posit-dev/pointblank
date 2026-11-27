@@ -252,12 +252,17 @@ class DraftValidation:
     api_key: str | None = None
     verify_ssl: bool = True
     max_reprompts: int = 1
+    attachments: list | None = None
     response: str = field(init=False)
     code: str = field(init=False)
 
     def __post_init__(self) -> None:
         # Check that the chatlas package is installed
         _check_ai_package("chatlas", "to use the `DraftValidation` class")
+
+        # Turn `attachments=` into chatlas Content objects, failing on an unsupported file type
+        # before the table is summarized
+        attachments = _prepare_attachments(self.attachments)
 
         # Generate a table summary in JSON format using the `DataScan` class
         tbl_json = DataScan(data=self.data).to_json()
@@ -280,6 +285,33 @@ class DraftValidation:
         with files("pointblank.data").joinpath("api-docs.txt").open(encoding="utf-8") as f:
             api_and_examples_text = f.read()
 
+        # Reference files describe what the table *should* contain, so their expectations take
+        # precedence over what the summary says the table *does* contain
+        if attachments:
+            attachments_text = (
+                " "
+                "Reference files (images or PDFs) are attached to this message. They describe what "
+                "the table should contain (e.g., a data dictionary, a schema diagram, or a "
+                "specification). Additional notes for using them:"
+                " "
+                "  - when an attachment gives an expectation for the data (a range, a set of "
+                "    allowed values, a required column, a key, a format), use it in the plan, even "
+                "    if the JSON summary disagrees, since the plan is meant to catch data that "
+                "    doesn't meet the expectations; for anything the attachments don't cover, use "
+                "    the JSON summary as described below"
+                "  - add a short comment to the right of each step that comes from an attachment "
+                "    (e.g., # From the data dictionary)"
+                "  - in the `Schema`, still take each column type exactly from the JSON summary "
+                "    (they are the table's own type names); if an attachment gives a different "
+                "    type, say so in a comment on that line"
+                "  - if an attachment requires a column that isn't in the JSON summary, add it to "
+                "    the `Schema` as a name-only tuple (e.g., `('column_name',)`) with a comment, "
+                "    and don't use it in any other step"
+                " "
+            )
+        else:
+            attachments_text = ""
+
         prompt = (
             f"{api_and_examples_text}"
             "--------------------------"
@@ -291,6 +323,7 @@ class DraftValidation:
             f"{tbl_json}"
             "```"
             " "
+            f"{attachments_text}"
             "Provide a single piece of Python code for a validation plan that is contained in "
             "```python + ``` code fences. Don't provide any text before or after this block. Use "
             "the same style as in the provided examples."
